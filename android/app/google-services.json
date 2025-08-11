@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "486459863712",
+    "project_id": "learnapp-bd021",
+    "storage_bucket": "learnapp-bd021.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:486459863712:android:bdb7d475120ea3d321cfc5",
+        "android_client_info": {
+          "package_name": "com.example.learnapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCbeGkj_7lvfj0R_oN7mMyzKluly-dqzBo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

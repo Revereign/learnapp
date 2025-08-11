@@ -1,0 +1,28 @@
+{
+  "buildFiles": [
+    "D:\\Kuliah\\S6\\MDP\\Flutter\\flutter\\packages\\flutter_tools\\gradle\\src\\main\\groovy\\CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "D:\\Kuliah\\S6\\MDP\\AndroidData\\cmake\\3.22.1\\bin\\ninja.exe",
+      "-C",
+      "D:\\Kuliah\\S8\\learnapp\\android\\app\\.cxx\\Debug\\6a6a2t23\\armeabi-v7a",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "D:\\Kuliah\\S6\\MDP\\AndroidData\\cmake\\3.22.1\\bin\\ninja.exe",
+    "-C",
+    "D:\\Kuliah\\S8\\learnapp\\android\\app\\.cxx\\Debug\\6a6a2t23\\armeabi-v7a",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {},
+  "toolchains": {
+    "toolchain": {
+      "cCompilerExecutable": "D:\\Kuliah\\S6\\MDP\\AndroidData\\ndk\\26.3.11579264\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang.exe",
+      "cppCompilerExecutable": "D:\\Kuliah\\S6\\MDP\\AndroidData\\ndk\\26.3.11579264\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe"
+    }
+  },
+  "cFileExtensions": [],
+  "cppFileExtensions": []
+}
