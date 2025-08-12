@@ -11,6 +11,7 @@ import 'package:learnapp/presentation/pages/child/sentence_page.dart';
 import 'package:learnapp/presentation/pages/child/quiz_page.dart';
 import 'package:learnapp/presentation/pages/child/color_matching_game_page.dart';
 import 'package:learnapp/presentation/pages/child/game_loading_page.dart'; // Added import for GameLoadingPage
+import 'package:learnapp/presentation/pages/child/counting_game_page.dart';
 
 class SubLevelPage extends StatefulWidget {
   final int level;
@@ -122,6 +123,18 @@ class _SubLevelPageState extends State<SubLevelPage>
                 ),
               ),
             );
+          } else if (widget.level == 2) {
+            // Stop BGM when entering counting game
+            _audioManager.stopBGM();
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => CountingGamePage(level: widget.level),
+              ),
+            ).then((_) {
+              // Resume BGM when returning from counting game
+              _audioManager.startBGM('menu_bgm.mp3');
+            });
           } else {
             // Stop BGM when entering play page
             _audioManager.stopBGM();

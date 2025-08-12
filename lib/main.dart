@@ -29,6 +29,7 @@ import 'package:learnapp/presentation/blocs/manage_users/manage_users_bloc.dart'
 import 'package:learnapp/presentation/blocs/materi/materi_bloc.dart';
 import 'package:learnapp/presentation/blocs/parent/register_child/child_auth_bloc.dart';
 import 'package:learnapp/presentation/blocs/child/level/level_bloc.dart';
+import 'package:learnapp/presentation/blocs/child/level/counting_game_bloc.dart';
 import 'package:learnapp/presentation/blocs/vocabulary/vocabulary_bloc.dart';
 import 'package:learnapp/presentation/blocs/game/game_bloc.dart';
 import 'package:learnapp/core/routes/app_routes.dart';
@@ -152,6 +153,17 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create: (context) => LevelBloc(
             getAllMateri: GetAllMateri(
+              MateriRepositoryImpl(
+                remoteDataSource: MateriRemoteDataSourceImpl(
+                  firestore: FirebaseFirestore.instance,
+                ),
+              ),
+            ),
+          ),
+        ),
+        BlocProvider(
+          create: (context) => CountingGameBloc(
+            getMateriByLevel: GetMateriByLevel(
               MateriRepositoryImpl(
                 remoteDataSource: MateriRemoteDataSourceImpl(
                   firestore: FirebaseFirestore.instance,
