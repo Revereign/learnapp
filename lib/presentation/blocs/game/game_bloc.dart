@@ -37,6 +37,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
         currentQuestion: null,
         score: 0,
         totalQuestions: shuffledMateri.length,
+        lives: 4, // Initialize with 4 lives
       ));
       
       // Start first round
@@ -53,6 +54,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
         emit(GameCompleted(
           score: currentState.score,
           totalQuestions: currentState.totalQuestions,
+          lives: currentState.lives, // Include lives in completed state
         ));
         return;
       }
@@ -96,13 +98,25 @@ class GameBloc extends Bloc<GameEvent, GameState> {
           add(StartNewRound());
         });
       } else {
-        emit(currentState.copyWith(
-          lastAnswer: GameAnswer(
-            isCorrect: false,
-            selectedMateri: event.selectedMateri,
-            correctMateri: currentState.currentQuestion!.materi,
-          ),
-        ));
+        // Reduce life when answer is wrong
+        final newLives = currentState.lives - 1;
+        
+        if (newLives <= 0) {
+          // Game over when lives are exhausted
+          emit(GameOver(
+            score: currentState.score,
+            totalQuestions: currentState.totalQuestions,
+          ));
+        } else {
+          emit(currentState.copyWith(
+            lives: newLives,
+            lastAnswer: GameAnswer(
+              isCorrect: false,
+              selectedMateri: event.selectedMateri,
+              correctMateri: currentState.currentQuestion!.materi,
+            ),
+          ));
+        }
       }
     }
   }

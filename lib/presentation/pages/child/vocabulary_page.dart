@@ -385,7 +385,7 @@ class _VocabularyPageState extends State<VocabularyPage>
                    ),
                    const SizedBox(width: 8),
                    const Text(
-                     'Geser untuk pindah kartu',
+                     'Tap atau geser untuk berinteraksi',
                      style: TextStyle(
                        fontSize: 14,
                        color: Colors.white,

@@ -496,6 +496,35 @@ class _ColorMatchingGamePageState extends State<ColorMatchingGamePage>
     );
   }
 
+  Widget _buildLivesDisplay(int lives) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const SizedBox(width: 8),
+          Row(
+            children: List.generate(4, (index) {
+              return Padding(
+                padding: const EdgeInsets.only(right: 4),
+                child: Image.asset(
+                  'assets/images/heart.png',
+                  width: 24,
+                  height: 24,
+                  color: index < lives ? Colors.red : Colors.grey.withOpacity(0.5),
+                ),
+              );
+            }),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildCompletedScreen(GameCompleted state) {
     return Center(
       child: Container(
@@ -537,6 +566,44 @@ class _ColorMatchingGamePageState extends State<ColorMatchingGamePage>
               ),
               textAlign: TextAlign.center,
             ),
+            const SizedBox(height: 20),
+            // Display score in requested format
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              decoration: BoxDecoration(
+                color: Colors.orange.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(15),
+                border: Border.all(color: Colors.orange.withOpacity(0.3)),
+              ),
+              child: Text(
+                '${state.score}/${state.totalQuestions}',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.orange[700],
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            // Display remaining lives
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.favorite,
+                  color: Colors.red,
+                  size: 20,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Sisa Life: ${state.lives}',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Colors.black87,
+                  ),
+                ),
+              ],
+            ),
             const SizedBox(height: 30),
             ElevatedButton(
               onPressed: () async {
@@ -545,6 +612,92 @@ class _ColorMatchingGamePageState extends State<ColorMatchingGamePage>
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.orange,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+              child: const Text(
+                'Kembali',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGameOverScreen(GameOver state) {
+    return Center(
+      child: Container(
+        padding: const EdgeInsets.all(30),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.9),
+          borderRadius: BorderRadius.circular(25),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.3),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.heart_broken,
+              color: Colors.red,
+              size: 80,
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Game Over!',
+              style: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: Colors.red[700],
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'Life kamu habis!',
+              style: const TextStyle(
+                fontSize: 18,
+                color: Colors.black87,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            // Display score in requested format
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              decoration: BoxDecoration(
+                color: Colors.red.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(15),
+                border: Border.all(color: Colors.red.withOpacity(0.3)),
+              ),
+              child: Text(
+                '${state.score}/${state.totalQuestions}',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.red[700],
+                ),
+              ),
+            ),
+            const SizedBox(height: 30),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                 shape: RoundedRectangleBorder(
@@ -653,6 +806,10 @@ class _ColorMatchingGamePageState extends State<ColorMatchingGamePage>
                 return _buildCompletedScreen(state);
               }
 
+              if (state is GameOver) {
+                return _buildGameOverScreen(state);
+              }
+
               if (state is GameLoaded) {
                 return SingleChildScrollView(
                   child: Padding(
@@ -701,6 +858,11 @@ class _ColorMatchingGamePageState extends State<ColorMatchingGamePage>
                         // Question Area
                         if (state.currentQuestion != null)
                           _buildQuestionArea(state.currentQuestion!),
+                        
+                        const SizedBox(height: 20),
+                        
+                        // Lives Display
+                        _buildLivesDisplay(state.lives),
                         
                         const SizedBox(height: 30),
                         

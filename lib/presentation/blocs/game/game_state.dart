@@ -18,6 +18,7 @@ class GameLoaded extends GameState {
   final GameAnswer? lastAnswer;
   final int score;
   final int totalQuestions;
+  final int lives; // Add lives field
 
   const GameLoaded({
     required this.allMateri,
@@ -26,6 +27,7 @@ class GameLoaded extends GameState {
     this.lastAnswer,
     required this.score,
     required this.totalQuestions,
+    required this.lives, // Add lives parameter
   });
 
   GameLoaded copyWith({
@@ -35,6 +37,7 @@ class GameLoaded extends GameState {
     GameAnswer? lastAnswer,
     int? score,
     int? totalQuestions,
+    int? lives, // Add lives parameter
   }) {
     return GameLoaded(
       allMateri: allMateri ?? this.allMateri,
@@ -43,24 +46,27 @@ class GameLoaded extends GameState {
       lastAnswer: lastAnswer ?? this.lastAnswer,
       score: score ?? this.score,
       totalQuestions: totalQuestions ?? this.totalQuestions,
+      lives: lives ?? this.lives, // Add lives
     );
   }
 
   @override
-  List<Object?> get props => [allMateri, remainingMateri, currentQuestion, lastAnswer, score, totalQuestions];
+  List<Object?> get props => [allMateri, remainingMateri, currentQuestion, lastAnswer, score, totalQuestions, lives]; // Add lives to props
 }
 
 class GameCompleted extends GameState {
   final int score;
   final int totalQuestions;
+  final int lives; // Add lives field
 
   const GameCompleted({
     required this.score,
     required this.totalQuestions,
+    required this.lives, // Add lives parameter
   });
 
   @override
-  List<Object?> get props => [score, totalQuestions];
+  List<Object?> get props => [score, totalQuestions, lives]; // Add lives to props
 }
 
 class GameError extends GameState {
@@ -70,6 +76,19 @@ class GameError extends GameState {
 
   @override
   List<Object?> get props => [message];
+}
+
+class GameOver extends GameState {
+  final int score;
+  final int totalQuestions;
+
+  const GameOver({
+    required this.score,
+    required this.totalQuestions,
+  });
+
+  @override
+  List<Object?> get props => [score, totalQuestions];
 }
 
 class GameQuestion {

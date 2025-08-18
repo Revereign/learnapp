@@ -88,6 +88,7 @@ flutter:
   assets:
      - assets/images/logo.png
      - assets/images/default_avatar.jpg
+     - assets/images/heart.png
      - assets/animations/learning.json
      - assets/audio/click.mp3
      - assets/audio/menu_bgm.mp3
