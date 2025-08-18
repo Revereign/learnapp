@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:learnapp/core/services/audio_manager.dart';
 import 'package:learnapp/presentation/pages/child/latihan_membaca_page.dart';
+import 'package:learnapp/presentation/pages/child/latihan_goresan_page.dart';
 
 class LatihanPage extends StatefulWidget {
   final int level;
@@ -81,8 +82,17 @@ class _LatihanPageState extends State<LatihanPage>
           });
           break;
         case '/latihan-goresan':
-          // TODO: Implement Latihan Goresan page
-          print('Navigate to Latihan Goresan');
+          // Stop BGM when entering latihan goresan page
+          _audioManager.stopBGM();
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => LatihanGoresanPage(level: widget.level),
+            ),
+          ).then((_) {
+            // Resume BGM when returning from latihan goresan page
+            _audioManager.startBGM('menu_bgm.mp3');
+          });
           break;
         case '/buat-kalimat':
           // TODO: Implement Buat Kalimat page
