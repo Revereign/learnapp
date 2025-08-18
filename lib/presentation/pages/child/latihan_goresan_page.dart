@@ -7,6 +7,7 @@ import 'package:pinyin/pinyin.dart';
 import 'package:stroke_order_animator/stroke_order_animator.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:async';
 
 class LatihanGoresanPage extends StatefulWidget {
   final int level;
@@ -45,6 +46,10 @@ class _LatihanGoresanPageState extends State<LatihanGoresanPage>
   List<String> _currentCharacters = [];
   int _selectedCharacterIndex = 0;
   
+  // Timer management
+  Timer? _animationCompletionTimer;
+  Timer? _autoHideTimer;
+  
   // Writing test variables
   List<Offset> _points = [];
   List<List<Offset>> _strokes = [];
@@ -82,6 +87,12 @@ class _LatihanGoresanPageState extends State<LatihanGoresanPage>
 
   void _selectCharacter(int index) {
     if (index >= 0 && index < _currentCharacters.length) {
+      // Cancel any existing timers first
+      _animationCompletionTimer?.cancel();
+      _animationCompletionTimer = null;
+      _autoHideTimer?.cancel();
+      _autoHideTimer = null;
+      
       setState(() {
         _selectedCharacterIndex = index;
         _showStrokeOrder = false;
@@ -95,6 +106,44 @@ class _LatihanGoresanPageState extends State<LatihanGoresanPage>
       _strokeOrderAnimation = _loadStrokeOrder(_currentCharacters[index]);
     }
   }
+
+  void _listenToAnimationCompletion(StrokeOrderAnimationController controller) {
+    // Cancel any existing timer first
+    _animationCompletionTimer?.cancel();
+    
+    // Check animation status periodically
+    _animationCompletionTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
+      if (!mounted || !_showStrokeOrder) {
+        timer.cancel();
+        _animationCompletionTimer = null;
+        return;
+      }
+      
+      try {
+        // If animation is not running, wait 1 second then hide the stroke order area
+        if (!controller.isAnimating) {
+          timer.cancel();
+          _animationCompletionTimer = null;
+          if (mounted) {
+            // Add 1 second delay before hiding
+            Future.delayed(const Duration(seconds: 1), () {
+              if (mounted && _showStrokeOrder) {
+                setState(() {
+                  _showStrokeOrder = false;
+                });
+              }
+            });
+          }
+        }
+      } catch (e) {
+        print('Error checking animation status: $e');
+        timer.cancel();
+        _animationCompletionTimer = null;
+      }
+    });
+  }
+
+
 
   void _setupAnimations() {
     _animationController = AnimationController(
@@ -158,6 +207,8 @@ class _LatihanGoresanPageState extends State<LatihanGoresanPage>
         _showStrokeOrder = true;
       });
       
+
+      
       // Load stroke order animation for selected character
       _strokeOrderAnimation = _loadStrokeOrder(_currentCharacters[_selectedCharacterIndex]);
       _strokeOrderAnimation.then((controller) {
@@ -170,6 +221,9 @@ class _LatihanGoresanPageState extends State<LatihanGoresanPage>
             if (mounted) {
               try {
                 controller.startAnimation();
+                
+                // Listen for animation completion and hide stroke order area
+                _listenToAnimationCompletion(controller);
               } catch (e) {
                 print('Error starting animation: $e');
               }
@@ -185,13 +239,15 @@ class _LatihanGoresanPageState extends State<LatihanGoresanPage>
         }
       });
       
-      // Auto-hide after 8 seconds
-      Future.delayed(const Duration(seconds: 8), () {
-        if (mounted) {
+      // Auto-hide after animation completes or maximum time
+      _autoHideTimer?.cancel(); // Cancel any existing auto-hide timer
+      _autoHideTimer = Timer(const Duration(seconds: 15), () {
+        if (mounted && _showStrokeOrder) {
           setState(() {
             _showStrokeOrder = false;
           });
         }
+        _autoHideTimer = null;
       });
     }
   }
@@ -259,6 +315,12 @@ class _LatihanGoresanPageState extends State<LatihanGoresanPage>
 
   void _nextVocabulary() {
     if (_currentIndex < _materiList.length - 1) {
+      // Cancel any existing timers first
+      _animationCompletionTimer?.cancel();
+      _animationCompletionTimer = null;
+      _autoHideTimer?.cancel();
+      _autoHideTimer = null;
+      
       setState(() {
         _currentIndex++;
         _showStrokeOrder = false;
@@ -275,6 +337,12 @@ class _LatihanGoresanPageState extends State<LatihanGoresanPage>
 
   void _previousVocabulary() {
     if (_currentIndex > 0) {
+      // Cancel any existing timers first
+      _animationCompletionTimer?.cancel();
+      _animationCompletionTimer = null;
+      _autoHideTimer?.cancel();
+      _autoHideTimer = null;
+      
       setState(() {
         _currentIndex--;
         _showStrokeOrder = false;
@@ -619,23 +687,27 @@ class _LatihanGoresanPageState extends State<LatihanGoresanPage>
                         
                         // Stroke order button
                         GestureDetector(
-                          onTap: _showStrokeOrderAnimation,
+                          onTap: _showStrokeOrder ? null : _showStrokeOrderAnimation,
                           child: Container(
                             width: 80,
                             height: 80,
                             decoration: BoxDecoration(
-                              color: Colors.teal.shade400,
+                              color: _showStrokeOrder 
+                                ? Colors.grey.shade400 
+                                : Colors.teal.shade400,
                               borderRadius: BorderRadius.circular(40),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.teal.withOpacity(0.3),
+                                  color: (_showStrokeOrder 
+                                    ? Colors.grey 
+                                    : Colors.teal).withOpacity(0.3),
                                   blurRadius: 15,
                                   offset: const Offset(0, 8),
                                 ),
                               ],
                             ),
-                            child: const Icon(
-                              Icons.brush,
+                            child: Icon(
+                              _showStrokeOrder ? Icons.brush_outlined : Icons.brush,
                               color: Colors.white,
                               size: 40,
                             ),
@@ -668,7 +740,7 @@ class _LatihanGoresanPageState extends State<LatihanGoresanPage>
                           Column(
                             children: [
                               const Text(
-                                'Urutan Goresan:',
+                                'Urutan Goresan',
                                 style: TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
@@ -764,7 +836,7 @@ class _LatihanGoresanPageState extends State<LatihanGoresanPage>
                         Column(
                           children: [
                             const Text(
-                              'Tes Goresan:',
+                              'Tes Goresan',
                               style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
@@ -1060,6 +1132,11 @@ class _LatihanGoresanPageState extends State<LatihanGoresanPage>
     _httpClient.close();
     _strokeOrderController?.dispose();
     _scrollController.dispose();
+    
+    // Cancel all timers
+    _animationCompletionTimer?.cancel();
+    _autoHideTimer?.cancel();
+    
     super.dispose();
   }
 }
