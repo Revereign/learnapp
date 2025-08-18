@@ -116,9 +116,16 @@ Fitur Latihan adalah halaman baru yang menggantikan tombol "Buat Kalimat" di `su
 - UI/UX dengan animasi
 - Audio management (BGM)
 - Styling yang konsisten
+- **Halaman Latihan Membaca lengkap dengan fitur:**
+  - ✅ Text-to-Speech (TTS) untuk pengucapan Hanzi
+  - ✅ Speech-to-Text (STT) untuk pengenalan suara
+  - ✅ Pengecekan pengucapan dengan feedback visual
+  - ✅ Tampilan kosakata dari Firebase Firestore
+  - ✅ Navigasi antar kosakata
+  - ✅ UI yang menarik untuk anak-anak
 
 ### **🔧 TODO (Implementasi Selanjutnya):**
-- Halaman "Latihan Membaca" (`/latihan-membaca`)
+- ✅ **Halaman "Latihan Membaca"** (`/latihan-membaca`) - **SUDAH SELESAI**
 - Halaman "Latihan Goresan" (`/latihan-goresan`)
 - Halaman "Buat Kalimat" (`/buat-kalimat`)
 - Logic untuk setiap jenis latihan

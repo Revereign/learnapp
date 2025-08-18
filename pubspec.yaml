@@ -61,6 +61,7 @@ dependencies:
   pinyin: ^3.0.1
   cached_network_image: ^3.3.0
   flutter_cache_manager: ^3.3.1
+  speech_to_text: ^6.6.0
 
 dev_dependencies:
   flutter_test:

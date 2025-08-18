@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:learnapp/core/services/audio_manager.dart';
+import 'package:learnapp/presentation/pages/child/latihan_membaca_page.dart';
 
 class LatihanPage extends StatefulWidget {
   final int level;
@@ -67,8 +68,17 @@ class _LatihanPageState extends State<LatihanPage>
     if (mounted) {
       switch (route) {
         case '/latihan-membaca':
-          // TODO: Implement Latihan Membaca page
-          print('Navigate to Latihan Membaca');
+          // Stop BGM when entering latihan membaca page
+          _audioManager.stopBGM();
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => LatihanMembacaPage(level: widget.level),
+            ),
+          ).then((_) {
+            // Resume BGM when returning from latihan membaca page
+            _audioManager.startBGM('menu_bgm.mp3');
+          });
           break;
         case '/latihan-goresan':
           // TODO: Implement Latihan Goresan page
