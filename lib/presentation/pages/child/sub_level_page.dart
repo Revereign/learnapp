@@ -12,6 +12,8 @@ import 'package:learnapp/presentation/pages/child/quiz_page.dart';
 import 'package:learnapp/presentation/pages/child/color_matching_game_page.dart';
 import 'package:learnapp/presentation/pages/child/game_loading_page.dart'; // Added import for GameLoadingPage
 import 'package:learnapp/presentation/pages/child/counting_game_page.dart';
+import 'package:learnapp/presentation/pages/child/find_object_game_page.dart';
+import 'package:learnapp/presentation/pages/child/latihan_page.dart';
 
 class SubLevelPage extends StatefulWidget {
   final int level;
@@ -135,6 +137,22 @@ class _SubLevelPageState extends State<SubLevelPage>
               // Resume BGM when returning from counting game
               _audioManager.startBGM('menu_bgm.mp3');
             });
+          } else if (widget.level == 3) {
+            // Stop BGM when entering level 3 find object game
+            _audioManager.stopBGM();
+            
+            // Navigate directly to level 3 game (no loading needed)
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => Level3FindObjectGamePage(
+                  level: 3,
+                ),
+              ),
+            ).then((_) {
+              // Resume BGM when returning from level 3 game
+              _audioManager.startBGM('menu_bgm.mp3');
+            });
           } else {
             // Stop BGM when entering play page
             _audioManager.stopBGM();
@@ -148,6 +166,15 @@ class _SubLevelPageState extends State<SubLevelPage>
               _audioManager.startBGM('menu_bgm.mp3');
             });
           }
+          break;
+        case '/latihan':
+          // BGM tetap menyala saat masuk ke halaman latihan
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => LatihanPage(level: widget.level),
+            ),
+          );
           break;
         case '/sentence':
           // Stop BGM when entering sentence page
@@ -313,11 +340,11 @@ class _SubLevelPageState extends State<SubLevelPage>
             const SizedBox(height: 20),
             
             _buildActivityButton(
-              title: 'Buat Kalimat',
-              subtitle: 'Latihan membuat kalimat',
-              icon: Icons.edit_note,
+              title: 'Latihan',
+              subtitle: 'Memahami lebih dalam',
+              icon: Icons.school,
               color: Colors.purple,
-              route: '/sentence',
+              route: '/latihan',
               delay: 400,
             ),
             
