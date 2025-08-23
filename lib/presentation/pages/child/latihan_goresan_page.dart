@@ -54,6 +54,13 @@ class _LatihanGoresanPageState extends State<LatihanGoresanPage>
   List<Offset> _points = [];
   List<List<Offset>> _strokes = [];
   
+  // Quiz mode variables
+  StrokeOrderAnimationController? _quizController;
+  bool _isQuizMode = false;
+  bool _showQuizResult = false;
+  bool _isQuizComplete = false;
+  int _totalMistakes = 0;
+  
   @override
   void initState() {
     super.initState();
@@ -73,6 +80,30 @@ class _LatihanGoresanPageState extends State<LatihanGoresanPage>
       return controller;
     }).catchError((error) {
       print('Error downloading stroke order for character $character: $error');
+      throw error;
+    });
+  }
+
+  Future<StrokeOrderAnimationController> _loadStrokeOrderForQuiz(String character) {
+    return downloadStrokeOrder(character, _httpClient).then((value) {
+      final controller = StrokeOrderAnimationController(
+        StrokeOrder(value),
+        this,
+        onQuizCompleteCallback: (summary) {
+          // Handle quiz completion
+          setState(() {
+            _isQuizComplete = true;
+            _showQuizResult = true;
+            _totalMistakes = summary.nTotalMistakes;
+          });
+          
+          // Play sound effect
+          _audioManager.playSFX('correct_answer.mp3');
+        },
+      );
+      return controller;
+    }).catchError((error) {
+      print('Error downloading stroke order for quiz: $error');
       throw error;
     });
   }
@@ -97,9 +128,14 @@ class _LatihanGoresanPageState extends State<LatihanGoresanPage>
         _selectedCharacterIndex = index;
         _showStrokeOrder = false;
         _isTestActive = false;
+        _isQuizMode = false;
+        _showQuizResult = false;
+        _isQuizComplete = false;
+        _totalMistakes = 0;
         _points.clear();
         _strokes.clear();
         _strokeOrderController = null;
+        _quizController = null;
       });
       
       // Load stroke order for selected character
@@ -142,8 +178,6 @@ class _LatihanGoresanPageState extends State<LatihanGoresanPage>
       }
     });
   }
-
-
 
   void _setupAnimations() {
     _animationController = AnimationController(
@@ -207,8 +241,6 @@ class _LatihanGoresanPageState extends State<LatihanGoresanPage>
         _showStrokeOrder = true;
       });
       
-
-      
       // Load stroke order animation for selected character
       _strokeOrderAnimation = _loadStrokeOrder(_currentCharacters[_selectedCharacterIndex]);
       _strokeOrderAnimation.then((controller) {
@@ -252,30 +284,53 @@ class _LatihanGoresanPageState extends State<LatihanGoresanPage>
     }
   }
 
-  void _startTest() {
-    setState(() {
-      _isTestActive = true;
-      _points.clear();
-      _strokes.clear();
-    });
+  void _startTest() async {
+    if (_currentCharacters.isEmpty) return;
     
-    // Auto-scroll to bottom after a short delay to show the writing area
-    Future.delayed(const Duration(milliseconds: 300), () {
-      if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 800),
-          curve: Curves.easeInOut,
-        );
-      }
-    });
-  }
-
-  void _undoStroke() {
-    if (_strokes.isNotEmpty) {
+    try {
+      // Load stroke order for quiz mode
+      final quizController = await _loadStrokeOrderForQuiz(_currentCharacters[_selectedCharacterIndex]);
+      
       setState(() {
-        _strokes.removeLast();
+        _isTestActive = true;
+        _isQuizMode = true;
+        _showQuizResult = false;
+        _isQuizComplete = false;
+        _totalMistakes = 0;
+        _points.clear();
+        _strokes.clear();
+        _quizController = quizController;
       });
+      
+      // Start quiz mode
+      Future.delayed(const Duration(milliseconds: 300), () {
+        if (mounted && _quizController != null) {
+          try {
+            _quizController!.startQuiz();
+          } catch (e) {
+            print('Error starting quiz: $e');
+          }
+        }
+      });
+      
+      // Auto-scroll to bottom after a short delay to show the writing area
+      Future.delayed(const Duration(milliseconds: 300), () {
+        if (_scrollController.hasClients) {
+          _scrollController.animateTo(
+            _scrollController.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 800),
+            curve: Curves.easeInOut,
+          );
+        }
+      });
+    } catch (e) {
+      print('Error starting test: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Gagal memulai tes goresan'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -283,34 +338,20 @@ class _LatihanGoresanPageState extends State<LatihanGoresanPage>
     setState(() {
       _points.clear();
       _strokes.clear();
+      _showQuizResult = false;
+      _isQuizComplete = false;
+      _totalMistakes = 0;
     });
-  }
-
-  void _checkWriting() {
-    // Simple validation - check if user has drawn something
-    if (_strokes.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Silakan tulis karakter terlebih dahulu')),
-      );
-      return;
+    
+    // Reset quiz if in quiz mode
+    if (_isQuizMode && _quizController != null) {
+      try {
+        _quizController!.reset();
+        _quizController!.startQuiz();
+      } catch (e) {
+        print('Error resetting quiz: $e');
+      }
     }
-    
-    // Play sound effect
-    _audioManager.playSFX('correct_answer.mp3');
-    
-    // Show success message
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Bagus! Latihan goresan selesai'),
-        backgroundColor: Colors.green,
-      ),
-    );
-    
-    // Reset test
-    _resetTest();
-    setState(() {
-      _isTestActive = false;
-    });
   }
 
   void _nextVocabulary() {
@@ -325,9 +366,14 @@ class _LatihanGoresanPageState extends State<LatihanGoresanPage>
         _currentIndex++;
         _showStrokeOrder = false;
         _isTestActive = false;
+        _isQuizMode = false;
+        _showQuizResult = false;
+        _isQuizComplete = false;
+        _totalMistakes = 0;
         _points.clear();
         _strokes.clear();
         _strokeOrderController = null;
+        _quizController = null;
       });
       
       // Split characters for new vocabulary
@@ -347,9 +393,14 @@ class _LatihanGoresanPageState extends State<LatihanGoresanPage>
         _currentIndex--;
         _showStrokeOrder = false;
         _isTestActive = false;
+        _isQuizMode = false;
+        _showQuizResult = false;
+        _isQuizComplete = false;
+        _totalMistakes = 0;
         _points.clear();
         _strokes.clear();
         _strokeOrderController = null;
+        _quizController = null;
       });
       
       // Split characters for new vocabulary
@@ -910,149 +961,171 @@ class _LatihanGoresanPageState extends State<LatihanGoresanPage>
                         if (_isTestActive) ...[
                           const SizedBox(height: 20),
                           
-                          Container(
-                            width: 200,
-                            height: 200,
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade100,
-                              borderRadius: BorderRadius.circular(15),
-                              border: Border.all(
-                                color: Colors.grey.shade300,
-                                width: 2,
-                              ),
-                            ),
-                            child: GestureDetector(
-                              onPanStart: (details) {
-                                setState(() {
-                                  _points = [details.localPosition];
-                                });
-                              },
-                              onPanUpdate: (details) {
-                                setState(() {
-                                  _points.add(details.localPosition);
-                                });
-                              },
-                              onPanEnd: (details) {
-                                setState(() {
-                                  if (_points.isNotEmpty) {
-                                    _strokes.add(List.from(_points));
-                                    _points.clear();
-                                  }
-                                });
-                              },
-                              child: CustomPaint(
-                                painter: WritingPainter(
-                                  strokes: _strokes,
-                                  currentPoints: _points,
+                          // Quiz mode display
+                          if (_isQuizMode && _quizController != null)
+                            Container(
+                              width: 200,
+                              height: 200,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(15),
+                                border: Border.all(
+                                  color: Colors.blue.shade300,
+                                  width: 3,
                                 ),
-                                size: const Size(200, 200),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(15),
+                                child: ListenableBuilder(
+                                  listenable: _quizController!,
+                                  builder: (context, child) {
+                                    return StrokeOrderAnimator(
+                                      _quizController!,
+                                      size: const Size(200, 200),
+                                    );
+                                  },
+                                ),
+                              ),
+                            )
+                          else
+                            Container(
+                              width: 200,
+                              height: 200,
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade100,
+                                borderRadius: BorderRadius.circular(15),
+                                border: Border.all(
+                                  color: Colors.grey.shade300,
+                                  width: 2,
+                                ),
+                              ),
+                              child: GestureDetector(
+                                onPanStart: (details) {
+                                  setState(() {
+                                    _points = [details.localPosition];
+                                  });
+                                },
+                                onPanUpdate: (details) {
+                                  setState(() {
+                                    _points.add(details.localPosition);
+                                  });
+                                },
+                                onPanEnd: (details) {
+                                  setState(() {
+                                    if (_points.isNotEmpty) {
+                                      _strokes.add(List.from(_points));
+                                      _points.clear();
+                                    }
+                                  });
+                                },
+                                child: CustomPaint(
+                                  painter: WritingPainter(
+                                    strokes: _strokes,
+                                    currentPoints: _points,
+                                  ),
+                                  size: const Size(200, 200),
+                                ),
                               ),
                             ),
-                          ),
                           
                           const SizedBox(height: 20),
                           
-                          // Control buttons - 2x2 Grid
-                          Column(
+                          // Quiz progress indicator
+                          if (_isQuizMode && _quizController != null)
+                            ListenableBuilder(
+                              listenable: _quizController!,
+                              builder: (context, child) {
+                                return Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue.shade100,
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(
+                                      color: Colors.blue.shade300,
+                                      width: 2,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        _quizController!.isQuizzing ? Icons.edit : Icons.check_circle,
+                                        color: Colors.blue.shade700,
+                                        size: 20,
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Text(
+                                        _quizController!.isQuizzing 
+                                          ? 'Lanjutkan goresan berikutnya'
+                                          : 'Selesai! Kesalahan $_totalMistakes kali.',
+                                        style: TextStyle(
+                                          color: Colors.blue.shade700,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          
+                          const SizedBox(height: 20),
+                          
+                          // Control buttons - Simplified layout
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  // Undo button
-                                  GestureDetector(
-                                    onTap: _undoStroke,
-                                    child: Container(
-                                      width: 100,
-                                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                                      decoration: BoxDecoration(
-                                        color: Colors.orange.shade400,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      child: const Text(
-                                        'Undo',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ),
+                              // Reset button
+                              GestureDetector(
+                                onTap: _resetTest,
+                                child: Container(
+                                  width: 120,
+                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.red.shade400,
+                                    borderRadius: BorderRadius.circular(20),
                                   ),
-                                  
-                                  // Reset button
-                                  GestureDetector(
-                                    onTap: _resetTest,
-                                    child: Container(
-                                      width: 100,
-                                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                                      decoration: BoxDecoration(
-                                        color: Colors.red.shade400,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      child: const Text(
-                                        'Reset',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
+                                  child: const Text(
+                                    'Reset',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
                                     ),
+                                    textAlign: TextAlign.center,
                                   ),
-                                ],
+                                ),
                               ),
-                              const SizedBox(height: 15),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  // Back button
-                                  GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        _isTestActive = false;
-                                        _points.clear();
-                                        _strokes.clear();
-                                      });
-                                    },
-                                    child: Container(
-                                      width: 100,
-                                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                                      decoration: BoxDecoration(
-                                        color: Colors.blue.shade400,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      child: const Text(
-                                        'Back',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ),
+                              
+                              // Back button
+                              GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    _isTestActive = false;
+                                    _isQuizMode = false;
+                                    _showQuizResult = false;
+                                    _isQuizComplete = false;
+                                    _points.clear();
+                                    _strokes.clear();
+                                    _quizController = null;
+                                  });
+                                },
+                                child: Container(
+                                  width: 120,
+                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue.shade400,
+                                    borderRadius: BorderRadius.circular(20),
                                   ),
-                                  
-                                  // Done button
-                                  GestureDetector(
-                                    onTap: _checkWriting,
-                                    child: Container(
-                                      width: 100,
-                                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                                      decoration: BoxDecoration(
-                                        color: Colors.green.shade400,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      child: const Text(
-                                        'Done',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
+                                  child: const Text(
+                                    'Back',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
                                     ),
+                                    textAlign: TextAlign.center,
                                   ),
-                                ],
+                                ),
                               ),
                             ],
                           ),
@@ -1131,6 +1204,7 @@ class _LatihanGoresanPageState extends State<LatihanGoresanPage>
     _bounceController.dispose();
     _httpClient.close();
     _strokeOrderController?.dispose();
+    _quizController?.dispose();
     _scrollController.dispose();
     
     // Cancel all timers
