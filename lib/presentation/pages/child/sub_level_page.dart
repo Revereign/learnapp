@@ -14,6 +14,7 @@ import 'package:learnapp/presentation/pages/child/game_loading_page.dart'; // Ad
 import 'package:learnapp/presentation/pages/child/counting_game_page.dart';
 import 'package:learnapp/presentation/pages/child/find_object_game_page.dart';
 import 'package:learnapp/presentation/pages/child/latihan_page.dart';
+import 'package:learnapp/presentation/pages/child/jadikan_sempurna_game_page.dart';
 
 class SubLevelPage extends StatefulWidget {
   final int level;
@@ -151,6 +152,22 @@ class _SubLevelPageState extends State<SubLevelPage>
               ),
             ).then((_) {
               // Resume BGM when returning from level 3 game
+              _audioManager.startBGM('menu_bgm.mp3');
+            });
+          } else if (widget.level == 4) {
+            // Stop BGM when entering level 4 jadikan sempurna game
+            _audioManager.stopBGM();
+            
+            // Navigate directly to level 4 game
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => JadikanSempurnaGamePage(
+                  level: 4,
+                ),
+              ),
+            ).then((_) {
+              // Resume BGM when returning from level 4 game
               _audioManager.startBGM('menu_bgm.mp3');
             });
           } else {

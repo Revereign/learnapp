@@ -93,6 +93,7 @@ flutter:
      - assets/images/heart.png
      - assets/images/level3_bg.jpg
      - assets/animations/learning.json
+     - assets/animations/plant.json
      - assets/audio/click.mp3
      - assets/audio/menu_bgm.mp3
      - assets/audio/correct_answer.mp3
