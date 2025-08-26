@@ -165,7 +165,7 @@ class JadikanSempurnaBloc extends Bloc<JadikanSempurnaEvent, JadikanSempurnaStat
 
       // Load materi from level 4
       final materiList = await _materiRepository.getMateriByLevel(4);
-      
+
       if (materiList.isEmpty) {
         emit(const JadikanSempurnaError('Tidak ada materi untuk level 4'));
         return;
@@ -174,15 +174,15 @@ class JadikanSempurnaBloc extends Bloc<JadikanSempurnaEvent, JadikanSempurnaStat
       // Create 8 questions (mix of reading and stroke order)
       final questions = <JadikanSempurnaQuestion>[];
       final random = Random();
-      
+
       // Ensure we have enough materi for 8 questions
       final shuffledMateri = List.from(materiList)..shuffle(random);
-      
+
       for (int i = 0; i < 8; i++) {
         if (i < shuffledMateri.length) {
           final materi = shuffledMateri[i];
           final questionType = random.nextBool() ? QuestionType.reading : QuestionType.strokeOrder;
-          
+
           if (questionType == QuestionType.strokeOrder) {
             // For stroke order, select one character if the word has multiple characters
             final characters = materi.kosakata.split('');
@@ -234,11 +234,11 @@ class JadikanSempurnaBloc extends Bloc<JadikanSempurnaEvent, JadikanSempurnaStat
   ) {
     if (state is JadikanSempurnaLoaded) {
       final currentState = state as JadikanSempurnaLoaded;
-      
+
       if (currentState.currentQuestionIndex < currentState.questions.length - 1) {
         final nextIndex = currentState.currentQuestionIndex + 1;
         final nextQuestion = currentState.questions[nextIndex];
-        
+
         emit(currentState.copyWith(
           currentQuestionIndex: nextIndex,
           currentQuestion: nextQuestion,
@@ -255,28 +255,28 @@ class JadikanSempurnaBloc extends Bloc<JadikanSempurnaEvent, JadikanSempurnaStat
   }
 
   void _onCheckReadingAnswer(
-    CheckReadingAnswer event,
-    Emitter<JadikanSempurnaState> emit,
-  ) {
+      CheckReadingAnswer event,
+      Emitter<JadikanSempurnaState> emit,
+      ) {
     if (state is JadikanSempurnaLoaded) {
       final currentState = state as JadikanSempurnaLoaded;
-      
+
       // Check pronunciation against Mandarin (kosakata) - not arti
       final isCorrect = event.recognizedText.toLowerCase().contains(
-            currentState.currentQuestion.materi.kosakata.toLowerCase(),
-          );
+        currentState.currentQuestion.materi.kosakata.toLowerCase(),
+      );
 
       if (isCorrect) {
         // Correct answer
         final newScore = currentState.score + 1;
         final newPlantStage = newScore; // Direct: 1 correct = stage 1, 2 correct = stage 2, etc.
-        
+
         emit(currentState.copyWith(
           score: newScore,
           plantGrowthStage: newPlantStage,
           readingAttempts: 0,
         ));
-        
+
         // Check if player wins immediately (plant stage 5 = 100%)
         if (newPlantStage >= 5) {
           emit(currentState.copyWith(
@@ -292,12 +292,13 @@ class JadikanSempurnaBloc extends Bloc<JadikanSempurnaEvent, JadikanSempurnaStat
       } else {
         // Wrong answer
         final newAttempts = currentState.readingAttempts + 1;
-        
-        if (newAttempts >= 2) {
-          // Max attempts reached, move to next question
+
+        // UBAH: dari >= 2 menjadi >= 3 untuk memungkinkan 3 percobaan
+        if (newAttempts >= 3) {
+          // Max attempts reached (3 attempts = failed), move to next question
           add(StartNewQuestion());
         } else {
-          // Still have attempts
+          // Still have attempts (attempt 1 or 2)
           emit(currentState.copyWith(
             readingAttempts: newAttempts,
           ));

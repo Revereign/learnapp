@@ -219,19 +219,16 @@ class _JadikanSempurnaGamePageState extends State<JadikanSempurnaGamePage>
           _isProcessingAnswer = false;
         });
       } else {
-        // Wrong answer - increment attempts
-        final newAttempts = _readingAttempts + 1;
-        print('❌ Wrong answer! Attempts before: $_readingAttempts, after: $newAttempts');
+        // Wrong answer - let BLOC handle the attempt increment
+        final currentAttempts = currentState.readingAttempts;
+        print('❌ Wrong answer! Current attempts: $currentAttempts');
 
-        // Update UI immediately to show new attempt count
-        setState(() {
-          _readingAttempts = newAttempts;
-        });
+        // Always play wrong sound first
+        _audioManager.playSFX('wrong_answer.mp3');
 
-        if (newAttempts >= 2) {
-          // Max attempts reached (2 mistakes = failed), move to next question
-          print('🚫 Max attempts reached, moving to next question');
-          _audioManager.playSFX('wrong_answer.mp3');
+        if (currentAttempts >= 2) {
+          // This will be attempt 3 (after increment), which means game over
+          print('🚫 This will be attempt 3, moving to next question');
 
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -240,35 +237,30 @@ class _JadikanSempurnaGamePageState extends State<JadikanSempurnaGamePage>
               duration: const Duration(seconds: 2),
             ),
           );
-
-          // Send to BLOC to trigger failure
-          context.read<JadikanSempurnaBloc>().add(
-            CheckReadingAnswer(_recognizedText, correctAnswer),
-          );
-
-          // Clear UI (attempts will be reset by _resetForNewQuestion)
-          setState(() {
-            _recognizedText = '';
-            _isProcessingAnswer = false;
-          });
         } else {
-          // Still have attempts - show message and allow retry
-          print('🔄 Still have attempts, showing retry message');
-          _audioManager.playSFX('wrong_answer.mp3');
+          // This is attempt 1 or 2, show retry message
+          final nextAttemptNumber = currentAttempts + 1;
+          print('🔄 This will be attempt $nextAttemptNumber, showing retry message');
+
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Salah! Coba lagi! (Kesalahan $newAttempts/2)'),
+              content: Text('Salah! Coba lagi! (Kesalahan $nextAttemptNumber/2)'),
               backgroundColor: Colors.orange,
               duration: const Duration(seconds: 2),
             ),
           );
-
-          // Clear recognized text for retry but keep attempts
-          setState(() {
-            _recognizedText = '';
-            _isProcessingAnswer = false;
-          });
         }
+
+        // Send to BLOC to handle the logic and state update
+        context.read<JadikanSempurnaBloc>().add(
+          CheckReadingAnswer(_recognizedText, correctAnswer),
+        );
+
+        // Clear UI
+        setState(() {
+          _recognizedText = '';
+          _isProcessingAnswer = false;
+        });
       }
     } else {
       print('❌ Current state is not JadikanSempurnaLoaded: ${currentState.runtimeType}');
