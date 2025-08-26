@@ -58,12 +58,16 @@ class _JadikanSempurnaGamePageState extends State<JadikanSempurnaGamePage>
   // Timers
   Timer? _animationCompletionTimer;
   Timer? _autoHideTimer;
+  Timer? _recognizedTextHideTimer; // Timer untuk auto-hide container "Yang kamu ucapkan"
   
   // Scroll controller
   final ScrollController _scrollController = ScrollController();
   
   // Track last question index for reset
   int? _lastQuestionIndex;
+  
+  // Tutorial popup
+  bool _showTutorial = true; // Show tutorial on game start
 
   @override
   void initState() {
@@ -88,6 +92,7 @@ class _JadikanSempurnaGamePageState extends State<JadikanSempurnaGamePage>
     _httpClient.close();
     _animationCompletionTimer?.cancel();
     _autoHideTimer?.cancel();
+    _recognizedTextHideTimer?.cancel();
     _scrollController.dispose();
     super.dispose();
   }
@@ -109,6 +114,7 @@ class _JadikanSempurnaGamePageState extends State<JadikanSempurnaGamePage>
     );
     
     _fadeController.forward();
+    _pulseController.repeat(reverse: true);
   }
 
   Future<void> _setupSpeechToText() async {
@@ -144,6 +150,11 @@ class _JadikanSempurnaGamePageState extends State<JadikanSempurnaGamePage>
         setState(() {
           _recognizedText = result.recognizedWords;
         });
+        
+        // Start auto-hide timer when new text is recognized
+        if (result.recognizedWords.isNotEmpty) {
+          _startRecognizedTextHideTimer();
+        }
       },
       listenFor: const Duration(seconds: 10),
       pauseFor: const Duration(seconds: 3),
@@ -175,10 +186,34 @@ class _JadikanSempurnaGamePageState extends State<JadikanSempurnaGamePage>
       _isProcessingAnswer = true;
     });
     
+    // Start auto-hide timer for recognized text container
+    _startRecognizedTextHideTimer();
+    
     print('🔍 Immediately calling _autoCheckReadingAnswer');
     
     // Check answer immediately without delay
     _autoCheckReadingAnswer();
+  }
+
+  void _startRecognizedTextHideTimer() {
+    // Cancel existing timer if any
+    _recognizedTextHideTimer?.cancel();
+    
+    // Start new timer to hide container after 3 seconds
+    _recognizedTextHideTimer = Timer(const Duration(seconds: 3), () {
+      if (mounted) {
+        setState(() {
+          _recognizedText = ''; // Clear recognized text to hide container
+        });
+      }
+    });
+  }
+
+  void _startGame() {
+    setState(() {
+      _showTutorial = false;
+    });
+    _audioManager.playSFX('click.mp3');
   }
 
   void _autoCheckReadingAnswer() {
@@ -214,6 +249,7 @@ class _JadikanSempurnaGamePageState extends State<JadikanSempurnaGamePage>
         );
 
         // Clear UI after sending to BLOC
+        _recognizedTextHideTimer?.cancel(); // Cancel auto-hide timer
         setState(() {
           _recognizedText = '';
           _isProcessingAnswer = false;
@@ -257,6 +293,7 @@ class _JadikanSempurnaGamePageState extends State<JadikanSempurnaGamePage>
         );
 
         // Clear UI
+        _recognizedTextHideTimer?.cancel(); // Cancel auto-hide timer
         setState(() {
           _recognizedText = '';
           _isProcessingAnswer = false;
@@ -433,6 +470,9 @@ class _JadikanSempurnaGamePageState extends State<JadikanSempurnaGamePage>
   }
 
   void _resetForNewQuestion() {
+    // Cancel timers
+    _recognizedTextHideTimer?.cancel();
+    
     setState(() {
       _isTestActive = false;
       _isQuizMode = false;
@@ -477,6 +517,168 @@ class _JadikanSempurnaGamePageState extends State<JadikanSempurnaGamePage>
 
 
 
+
+  Widget _buildTutorialPopup() {
+    return Container(
+      color: Colors.black.withOpacity(0.7),
+      child: Center(
+        child: Container(
+          margin: const EdgeInsets.all(30),
+          padding: const EdgeInsets.all(25),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.blue.shade100,
+                Colors.blue.shade200,
+                Colors.blue.shade300,
+              ],
+            ),
+            borderRadius: BorderRadius.circular(25),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.3),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header dengan emoji dan judul
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Petunjuk Bermain',
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue.shade800,
+                      shadows: [
+                        Shadow(
+                          color: Colors.white,
+                          blurRadius: 2,
+                          offset: const Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              
+              const SizedBox(height: 25),
+              
+              // Plant animation
+              Container(
+                width: 150,
+                height: 150,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: Colors.white.withOpacity(0.3),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(18),
+                  child: Lottie.asset(
+                    'assets/animations/plant.json',
+                    animate: true,
+                    repeat: true,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+              
+              const SizedBox(height: 25),
+              
+              // Petunjuk dengan style yang menarik
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.8),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: Colors.blue.shade400,
+                    width: 3,
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      'Jawab 5 soal dengan benar',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue.shade700,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'untuk menumbuhkan tanaman',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue.shade700,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    Text(
+                      'dengan sempurna!',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue.shade700,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+              
+              const SizedBox(height: 30),
+              
+              // Tombol mulai dengan animasi
+              AnimatedBuilder(
+                animation: _pulseController,
+                builder: (context, child) {
+                  return Transform.scale(
+                    scale: 1.0 + (_pulseController.value * 0.1),
+                    child: ElevatedButton(
+                      onPressed: _startGame,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green.shade500,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        elevation: 8,
+                        shadowColor: Colors.green.shade700,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Mulai Permainan',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
   Widget _buildPlantAnimation(int growthStage) {
     // Ensure growth stage is between 0 and 5
@@ -927,7 +1129,10 @@ class _JadikanSempurnaGamePageState extends State<JadikanSempurnaGamePage>
       ),
       actions: [
         ElevatedButton(
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            Navigator.pop(context); // Close dialog
+            Navigator.pop(context); // Go back to sub level page
+          },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.red.shade500,
             foregroundColor: Colors.white,
@@ -1122,7 +1327,10 @@ class _JadikanSempurnaGamePageState extends State<JadikanSempurnaGamePage>
       ),
       actions: [
         ElevatedButton(
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            Navigator.pop(context); // Close dialog
+            Navigator.pop(context); // Go back to sub level page
+          },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.green.shade500,
             foregroundColor: Colors.white,
@@ -1153,7 +1361,9 @@ class _JadikanSempurnaGamePageState extends State<JadikanSempurnaGamePage>
           ),
         ),
         child: SafeArea(
-          child: BlocConsumer<JadikanSempurnaBloc, JadikanSempurnaState>(
+          child: Stack(
+            children: [
+              BlocConsumer<JadikanSempurnaBloc, JadikanSempurnaState>(
                                                    listener: (context, state) {
                 if (state is JadikanSempurnaLoaded) {
                   // Reset state when question changes (but not on initial load)
@@ -1314,6 +1524,11 @@ class _JadikanSempurnaGamePageState extends State<JadikanSempurnaGamePage>
                 child: CircularProgressIndicator(),
               );
             },
+          ),
+              
+              // Tutorial popup overlay
+              if (_showTutorial) _buildTutorialPopup(),
+            ],
           ),
         ),
       ),

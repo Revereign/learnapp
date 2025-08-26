@@ -171,14 +171,14 @@ class JadikanSempurnaBloc extends Bloc<JadikanSempurnaEvent, JadikanSempurnaStat
         return;
       }
 
-      // Create 8 questions (mix of reading and stroke order)
+      // Create 7 questions (mix of reading and stroke order)
       final questions = <JadikanSempurnaQuestion>[];
       final random = Random();
 
-      // Ensure we have enough materi for 8 questions
+              // Ensure we have enough materi for 7 questions
       final shuffledMateri = List.from(materiList)..shuffle(random);
 
-      for (int i = 0; i < 8; i++) {
+              for (int i = 0; i < 7; i++) {
         if (i < shuffledMateri.length) {
           final materi = shuffledMateri[i];
           final questionType = random.nextBool() ? QuestionType.reading : QuestionType.strokeOrder;
@@ -215,7 +215,7 @@ class JadikanSempurnaBloc extends Bloc<JadikanSempurnaEvent, JadikanSempurnaStat
         questions: questions,
         currentQuestionIndex: 0,
         score: 0,
-        totalQuestions: 8,
+        totalQuestions: 7,
         plantGrowthStage: 0,
         isGameCompleted: false,
         isGameOver: false,
@@ -277,18 +277,9 @@ class JadikanSempurnaBloc extends Bloc<JadikanSempurnaEvent, JadikanSempurnaStat
           readingAttempts: 0,
         ));
 
-        // Check if player wins immediately (plant stage 5 = 100%)
-        if (newPlantStage >= 5) {
-          emit(currentState.copyWith(
-            score: newScore,
-            plantGrowthStage: newPlantStage,
-            isGameCompleted: true,
-            readingAttempts: 0,
-          ));
-        } else {
-          // Move to next question
-          add(StartNewQuestion());
-        }
+        // Plant stage 5 = sempurna, tapi game lanjut sampai semua soal selesai
+        // Move to next question regardless of plant stage
+        add(StartNewQuestion());
       } else {
         // Wrong answer
         final newAttempts = currentState.readingAttempts + 1;
@@ -326,18 +317,9 @@ class JadikanSempurnaBloc extends Bloc<JadikanSempurnaEvent, JadikanSempurnaStat
           strokeOrderAttempts: 0,
         ));
 
-        // Check if player wins immediately (plant stage 5 = 100%)
-        if (newPlantStage >= 5) {
-          emit(currentState.copyWith(
-            score: newScore,
-            plantGrowthStage: newPlantStage,
-            isGameCompleted: true,
-            strokeOrderAttempts: 0,
-          ));
-        } else {
-          // Move to next question
-          add(StartNewQuestion());
-        }
+        // Plant stage 5 = sempurna, tapi game lanjut sampai semua soal selesai
+        // Move to next question regardless of plant stage
+        add(StartNewQuestion());
       } else {
         // Wrong answer (too many mistakes)
         final newAttempts = currentState.strokeOrderAttempts + 1;
