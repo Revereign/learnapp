@@ -751,19 +751,20 @@ class _JadikanSempurnaGamePageState extends State<JadikanSempurnaGamePage>
   Widget _buildReadingQuestion(JadikanSempurnaQuestion question) {
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.orange.shade300, Colors.orange.shade500],
-        ),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.orange.withOpacity(0.3),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
+              decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.green.shade200, Colors.green.shade400, Colors.green.shade300],
+            stops: const [0.0, 0.5, 1.0],
           ),
-        ],
-      ),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.green.withOpacity(0.3),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
       child: Column(
         children: [
           // Vocabulary display
@@ -937,19 +938,20 @@ class _JadikanSempurnaGamePageState extends State<JadikanSempurnaGamePage>
     
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.teal.shade300, Colors.teal.shade500],
-        ),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.teal.withOpacity(0.3),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
+              decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.green.shade200, Colors.green.shade400, Colors.green.shade300],
+            stops: const [0.0, 0.5, 1.0],
           ),
-        ],
-      ),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.green.withOpacity(0.3),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
       child: Column(
         children: [
           // Vocabulary display
@@ -1351,12 +1353,12 @@ class _JadikanSempurnaGamePageState extends State<JadikanSempurnaGamePage>
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
             colors: [
-              Colors.green.shade200,
-              Colors.green.shade100,
-              Colors.green.shade50,
+              Colors.orange.shade300,
+              Colors.orange.shade500,
+              Colors.orange.shade700,
             ],
           ),
         ),
