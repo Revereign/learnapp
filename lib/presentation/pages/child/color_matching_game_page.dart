@@ -833,9 +833,7 @@ class _ColorMatchingGamePageState extends State<ColorMatchingGamePage>
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    widget.level == 1 
-                                        ? 'Game Mencocokkan Warna'
-                                        : 'Game Mencocokkan Makanan',
+                                    'Game Mencocokkan',
                                     style: const TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,

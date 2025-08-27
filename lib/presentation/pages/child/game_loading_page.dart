@@ -419,11 +419,11 @@ class _GameLoadingPageState extends State<GameLoadingPage>
 
   Widget _buildLoadingMessages() {
     final messages = [
-      'Menyiapkan soal...',
-      'Menyiapkan gambar...',
-      'Mengatur permainan...',
-      'Hampir selesai...',
-    ];
+            'Menyiapkan soal...',
+            'Menyiapkan gambar...',
+            'Mengatur permainan...',
+            'Hampir selesai...',
+          ];
     
     final currentIndex = (_progress * messages.length).floor().clamp(0, messages.length - 1);
     
