@@ -58,25 +58,25 @@ class LevelBloc extends Bloc<LevelEvent, LevelState> {
   String _getLevelDescription(int level) {
     switch (level) {
       case 1:
-        return 'Angka dan Warna Dasar';
+        return 'Warna Dasar';
       case 2:
-        return 'Keluarga dan Binatang';
+        return 'Buah-buahan';
       case 3:
-        return 'Makanan dan Minuman';
+        return 'Sayuran';
       case 4:
-        return 'Bagian Tubuh dan Pakaian';
+        return 'Bagian Tubuh';
       case 5:
-        return 'Transportasi dan Tempat';
+        return 'Makanan dan Minuman 1';
       case 6:
-        return 'Emosi dan Perasaan';
+        return 'Makanan dan Minuman 2';
       case 7:
-        return 'Hobi dan Aktivitas';
+        return 'Alat Transportasi';
       case 8:
-        return 'Musim dan Cuaca';
+        return 'Hewan';
       case 9:
-        return 'Pekerjaan dan Profesi';
+        return 'Barang Sehari-hari 1';
       case 10:
-        return 'Negara dan Budaya';
+        return 'Barang Sehari-hari 2';
       default:
         return 'Level ${level}';
     }
