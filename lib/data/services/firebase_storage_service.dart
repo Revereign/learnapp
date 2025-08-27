@@ -4,9 +4,9 @@ import 'dart:typed_data';
 class FirebaseStorageService {
   final FirebaseStorage _storage = FirebaseStorage.instance;
 
-  Future<String?> getImageUrl(String documentId) async {
+  Future<String?> getImageUrl(String documentId, {int level = 1}) async {
     try {
-      final ref = _storage.ref().child('game_1/$documentId.png');
+      final ref = _storage.ref().child('game_$level/$documentId.png');
       return await ref.getDownloadURL();
     } catch (e) {
       print('Error getting image URL: $e');
@@ -14,9 +14,9 @@ class FirebaseStorageService {
     }
   }
 
-  Future<Uint8List?> getImageBytes(String documentId) async {
+  Future<Uint8List?> getImageBytes(String documentId, {int level = 1}) async {
     try {
-      final ref = _storage.ref().child('game_1/$documentId.png');
+      final ref = _storage.ref().child('game_$level/$documentId.png');
       final data = await ref.getData();
       return data;
     } catch (e) {

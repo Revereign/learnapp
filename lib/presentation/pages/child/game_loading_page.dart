@@ -138,8 +138,8 @@ class _GameLoadingPageState extends State<GameLoadingPage>
         final materi = materiList[i];
         
         try {
-          // Get image URL
-          final imageUrl = await _storageService.getImageUrl(materi.id);
+          // Get image URL based on level
+          final imageUrl = await _storageService.getImageUrl(materi.id, level: widget.level);
           if (imageUrl != null) {
             // Store the URL for the game page
             imageUrls[materi.id] = imageUrl;
@@ -419,7 +419,7 @@ class _GameLoadingPageState extends State<GameLoadingPage>
 
   Widget _buildLoadingMessages() {
     final messages = [
-      'Mengumpulkan warna-warna...',
+      'Menyiapkan soal...',
       'Menyiapkan gambar...',
       'Mengatur permainan...',
       'Hampir selesai...',

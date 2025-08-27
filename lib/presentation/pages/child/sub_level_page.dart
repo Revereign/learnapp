@@ -170,6 +170,38 @@ class _SubLevelPageState extends State<SubLevelPage>
               // Resume BGM when returning from level 4 game
               _audioManager.startBGM('menu_bgm.mp3');
             });
+          } else if (widget.level == 5) {
+            // Stop BGM when entering level 5 color matching game with food materials
+            _audioManager.stopBGM();
+            
+            // Show loading page first for level 5
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => GameLoadingPage(
+                  level: widget.level,
+                  gameTitle: 'Permainan Makanan',
+                  onAssetsLoaded: (Map<String, String> imageUrls) async {
+                    // Navigate to color matching game after loading
+                    if (mounted) {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ColorMatchingGamePage(
+                            level: 5,
+                            assetsPreLoaded: true, // Assets are pre-loaded from loading page
+                            preLoadedImageUrls: imageUrls, // Pass the loaded image URLs
+                          ),
+                        ),
+                      ).then((_) {
+                        // Resume BGM when returning from color matching game
+                        _audioManager.startBGM('menu_bgm.mp3');
+                      });
+                    }
+                  },
+                ),
+              ),
+            );
           } else {
             // Stop BGM when entering play page
             _audioManager.stopBGM();

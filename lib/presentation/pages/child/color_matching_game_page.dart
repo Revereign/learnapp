@@ -208,7 +208,7 @@ class _ColorMatchingGamePageState extends State<ColorMatchingGamePage>
       // Preload all images with cache manager
       for (final materi in _shuffledMateri) {
         if (!_imageUrls.containsKey(materi.id)) {
-          final url = await _storageService.getImageUrl(materi.id);
+          final url = await _storageService.getImageUrl(materi.id, level: widget.level);
           if (url != null) {
             _imageUrls[materi.id] = url;
             // Pre-cache the image
@@ -828,21 +828,28 @@ class _ColorMatchingGamePageState extends State<ColorMatchingGamePage>
                               ),
                             ),
                             const SizedBox(width: 10),
-                            const Expanded(
-                              child: Text(
-                                'Game Mencocokkan Warna',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                  shadows: [
-                                    Shadow(
-                                      color: Colors.black45,
-                                      blurRadius: 2,
-                                      offset: Offset(0, 1),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    widget.level == 1 
+                                        ? 'Game Mencocokkan Warna'
+                                        : 'Game Mencocokkan Makanan',
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                      shadows: [
+                                        Shadow(
+                                          color: Colors.black45,
+                                          blurRadius: 2,
+                                          offset: Offset(0, 1),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
