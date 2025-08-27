@@ -210,6 +210,22 @@ class _SubLevelPageState extends State<SubLevelPage>
               // Resume BGM when returning from level 4 game
               _audioManager.startBGM('menu_bgm.mp3');
             });
+          } else if (widget.level == 8) {
+            // Stop BGM when entering level 8 jadikan sempurna game
+            _audioManager.stopBGM();
+            
+            // Navigate directly to level 8 game
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => JadikanSempurnaGamePage(
+                  level: 8,
+                ),
+              ),
+            ).then((_) {
+              // Resume BGM when returning from level 8 game
+              _audioManager.startBGM('menu_bgm.mp3');
+            });
           } else if (widget.level == 5) {
             // Stop BGM when entering level 5 color matching game with food materials
             _audioManager.stopBGM();

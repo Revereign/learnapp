@@ -582,7 +582,9 @@ class _JadikanSempurnaGamePageState extends State<JadikanSempurnaGamePage>
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(18),
                   child: Lottie.asset(
-                    'assets/animations/plant.json',
+                    widget.level == 4 
+                        ? 'assets/animations/plant.json'
+                        : 'assets/animations/cake.json',
                     animate: true,
                     repeat: true,
                     fit: BoxFit.contain,
@@ -616,7 +618,9 @@ class _JadikanSempurnaGamePageState extends State<JadikanSempurnaGamePage>
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'untuk menumbuhkan tanaman',
+                      widget.level == 4 
+                          ? 'untuk menumbuhkan tanaman'
+                          : 'untuk membuat kue',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -625,7 +629,9 @@ class _JadikanSempurnaGamePageState extends State<JadikanSempurnaGamePage>
                       textAlign: TextAlign.center,
                     ),
                     Text(
-                      'dengan sempurna!',
+                      widget.level == 4 
+                          ? 'dengan sempurna!'
+                          : 'dengan sempurna!',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -696,7 +702,9 @@ class _JadikanSempurnaGamePageState extends State<JadikanSempurnaGamePage>
       child: ClipRRect(
         borderRadius: BorderRadius.circular(18),
         child: Lottie.asset(
-          'assets/animations/plant.json',
+          widget.level == 4 
+              ? 'assets/animations/plant.json'
+              : 'assets/animations/cake.json',
           animate: true,
           repeat: false,
           fit: BoxFit.contain,

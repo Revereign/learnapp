@@ -163,11 +163,11 @@ class JadikanSempurnaBloc extends Bloc<JadikanSempurnaEvent, JadikanSempurnaStat
     try {
       emit(JadikanSempurnaLoading());
 
-      // Load materi from level 4
-      final materiList = await _materiRepository.getMateriByLevel(4);
+      // Load materi from the specified level
+      final materiList = await _materiRepository.getMateriByLevel(event.level);
 
       if (materiList.isEmpty) {
-        emit(const JadikanSempurnaError('Tidak ada materi untuk level 4'));
+        emit(JadikanSempurnaError('Tidak ada materi untuk level ${event.level}'));
         return;
       }
 

@@ -102,6 +102,7 @@ flutter:
      - assets/audio/applause.mp3
      - assets/animations/birds.json
      - assets/animations/plant.json
+     - assets/animations/cake.json
      - .env
 
   # An image asset can refer to one or more resolution-specific "variants", see
