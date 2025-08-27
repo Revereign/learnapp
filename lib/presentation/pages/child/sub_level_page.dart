@@ -9,7 +9,7 @@ import 'package:learnapp/presentation/pages/child/vocabulary_page.dart';
 import 'package:learnapp/presentation/pages/child/play_page.dart';
 import 'package:learnapp/presentation/pages/child/sentence_page.dart';
 import 'package:learnapp/presentation/pages/child/quiz_page.dart';
-import 'package:learnapp/presentation/pages/child/color_matching_game_page.dart';
+import 'package:learnapp/presentation/pages/child/matching_game_page.dart';
 import 'package:learnapp/presentation/pages/child/game_loading_page.dart'; // Added import for GameLoadingPage
 import 'package:learnapp/presentation/pages/child/counting_game_page.dart';
 import 'package:learnapp/presentation/pages/child/find_object_game_page.dart';
