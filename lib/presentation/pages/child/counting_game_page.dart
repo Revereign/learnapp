@@ -90,8 +90,14 @@ class _CountingGamePageState extends State<CountingGamePage>
     // Check if we can add more fruits (max 10)
     if (_droppedFruits.length >= 10) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Kotak jawaban sudah penuh! Maksimal 10 buah.'),
+        SnackBar(
+          content: Text(
+            widget.level == 2 
+                ? 'Kotak jawaban sudah penuh! Maksimal 10 buah.'
+                : widget.level == 7
+                    ? 'Kotak jawaban sudah penuh! Maksimal 10 kendaraan.'
+                    : 'Kotak jawaban sudah penuh! Maksimal 10 barang.'
+          ),
           backgroundColor: Colors.red,
           duration: Duration(seconds: 2),
         ),
@@ -324,10 +330,10 @@ class _CountingGamePageState extends State<CountingGamePage>
                 ),
                 onPressed: _onBackToSubLevel,
               ),
-                             const Expanded(
+                             Expanded(
                  child: Text(
                    'Permainan Berhitung',
-                   style: TextStyle(
+                   style: const TextStyle(
                      fontSize: 22,
                      fontWeight: FontWeight.bold,
                      color: Colors.white,
@@ -827,9 +833,13 @@ class _CountingGamePageState extends State<CountingGamePage>
               ? Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
-                      'Taruh buah di sini!',
-                      style: TextStyle(
+                    Text(
+                      widget.level == 2 
+                          ? 'Taruh buah di sini!'
+                          : widget.level == 7
+                              ? 'Taruh kendaraan di sini!'
+                              : 'Taruh barang di sini!',
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -838,7 +848,11 @@ class _CountingGamePageState extends State<CountingGamePage>
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Maksimal 10 buah',
+                      widget.level == 2 
+                          ? 'Maksimal 10 buah'
+                          : widget.level == 7
+                              ? 'Maksimal 10 kendaraan'
+                              : 'Maksimal 10 barang',
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.8),
                         fontSize: 16,
@@ -946,9 +960,13 @@ class _CountingGamePageState extends State<CountingGamePage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            '🍎 Pilih Buah:',
-            style: TextStyle(
+          Text(
+            widget.level == 2 
+                ? '🍎 Pilih Buah:'
+                : widget.level == 7
+                    ? '🚗 Pilih Kendaraan:'
+                    : '💡 Pilih Barang:',
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 20,
               fontWeight: FontWeight.bold,

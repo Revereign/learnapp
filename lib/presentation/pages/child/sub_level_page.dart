@@ -138,6 +138,30 @@ class _SubLevelPageState extends State<SubLevelPage>
               // Resume BGM when returning from counting game
               _audioManager.startBGM('menu_bgm.mp3');
             });
+          } else if (widget.level == 7) {
+            // Stop BGM when entering level 7 counting game with vehicle materials
+            _audioManager.stopBGM();
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => CountingGamePage(level: widget.level),
+              ),
+            ).then((_) {
+              // Resume BGM when returning from counting game
+              _audioManager.startBGM('menu_bgm.mp3');
+            });
+          } else if (widget.level == 10) {
+            // Stop BGM when entering level 10 counting game with item materials
+            _audioManager.stopBGM();
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => CountingGamePage(level: widget.level),
+              ),
+            ).then((_) {
+              // Resume BGM when returning from counting game
+              _audioManager.startBGM('menu_bgm.mp3');
+            });
           } else if (widget.level == 3) {
             // Stop BGM when entering level 3 find object game
             _audioManager.stopBGM();
