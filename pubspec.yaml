@@ -92,6 +92,7 @@ flutter:
      - assets/images/default_avatar.jpg
      - assets/images/heart.png
      - assets/images/level3_bg.jpg
+     - assets/images/level6_bg.png
      - assets/animations/learning.json
      - assets/animations/plant.json
      - assets/audio/click.mp3

@@ -178,6 +178,22 @@ class _SubLevelPageState extends State<SubLevelPage>
               // Resume BGM when returning from level 3 game
               _audioManager.startBGM('menu_bgm.mp3');
             });
+          } else if (widget.level == 6) {
+            // Stop BGM when entering level 6 find object game
+            _audioManager.stopBGM();
+            
+            // Navigate directly to level 6 game (no loading needed)
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => Level3FindObjectGamePage(
+                  level: 6,
+                ),
+              ),
+            ).then((_) {
+              // Resume BGM when returning from level 6 game
+              _audioManager.startBGM('menu_bgm.mp3');
+            });
           } else if (widget.level == 4) {
             // Stop BGM when entering level 4 jadikan sempurna game
             _audioManager.stopBGM();

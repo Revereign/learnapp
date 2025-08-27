@@ -458,7 +458,9 @@ class _Level3FindObjectGamePageState extends State<Level3FindObjectGamePage>
             // Background image
             Positioned.fill(
               child: Image.asset(
-                'assets/images/level3_bg.jpg',
+                widget.level == 3 
+                    ? 'assets/images/level3_bg.jpg'
+                    : 'assets/images/level6_bg.png',
                 fit: BoxFit.cover,
               ),
             ),
