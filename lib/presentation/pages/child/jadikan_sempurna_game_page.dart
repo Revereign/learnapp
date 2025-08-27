@@ -134,9 +134,6 @@ class _JadikanSempurnaGamePageState extends State<JadikanSempurnaGamePage>
 
   Future<void> _startListening() async {
     if (!_speechEnabled) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Speech recognition not available')),
-      );
       return;
     }
     
@@ -265,26 +262,10 @@ class _JadikanSempurnaGamePageState extends State<JadikanSempurnaGamePage>
         if (currentAttempts >= 2) {
           // This will be attempt 3 (after increment), which means game over
           print('🚫 This will be attempt 3, moving to next question');
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Maksimal 2 kesalahan. Lanjut ke soal berikutnya.'),
-              backgroundColor: Colors.red,
-              duration: const Duration(seconds: 2),
-            ),
-          );
         } else {
           // This is attempt 1 or 2, show retry message
           final nextAttemptNumber = currentAttempts + 1;
           print('🔄 This will be attempt $nextAttemptNumber, showing retry message');
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Salah! Coba lagi! (Kesalahan $nextAttemptNumber/2)'),
-              backgroundColor: Colors.orange,
-              duration: const Duration(seconds: 2),
-            ),
-          );
         }
 
         // Send to BLOC to handle the logic and state update
@@ -320,12 +301,6 @@ class _JadikanSempurnaGamePageState extends State<JadikanSempurnaGamePage>
           if (summary.nTotalMistakes <= 1) {
             // Successful completion
             _audioManager.playSFX('correct_answer.mp3');
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Bagus! Goresan sudah benar.'),
-                backgroundColor: Colors.green,
-              ),
-            );
 
             // Move to next question with success
             context.read<JadikanSempurnaBloc>().add(
@@ -344,12 +319,6 @@ class _JadikanSempurnaGamePageState extends State<JadikanSempurnaGamePage>
             if (newAttempts >= 2) {
               // Max attempts reached, move to next question immediately
               _audioManager.playSFX('wrong_answer.mp3');
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Maksimal 2 kesalahan. Lanjut ke soal berikutnya.'),
-                  backgroundColor: Colors.red,
-                ),
-              );
 
               // Move to next question with failure immediately
               context.read<JadikanSempurnaBloc>().add(
@@ -360,12 +329,6 @@ class _JadikanSempurnaGamePageState extends State<JadikanSempurnaGamePage>
             } else {
               // Allow retry
               _audioManager.playSFX('wrong_answer.mp3');
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Terlalu banyak kesalahan. Coba lagi! (Kesalahan $newAttempts/2)'),
-                  backgroundColor: Colors.orange,
-                ),
-              );
 
               // Reset quiz for retry but keep attempts
               _strokeOrderController?.reset();
@@ -403,12 +366,6 @@ class _JadikanSempurnaGamePageState extends State<JadikanSempurnaGamePage>
         });
       }).catchError((error) {
         print('Error loading stroke order: $error');
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Gagal memuat data goresan'),
-            backgroundColor: Colors.red,
-          ),
-        );
       });
       
       // Auto-scroll to bottom after a short delay
