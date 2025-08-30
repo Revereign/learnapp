@@ -50,7 +50,7 @@ class KelolaSoalKuisPage extends StatelessWidget {
               Colors.teal.shade400,
             ),
             _buildMenuCard(
-              "Lihat & Kelola Soal Tersimpan",
+              "Kelola Soal Tersimpan",
               Icons.library_books,
                   () => Navigator.push(
                 context,

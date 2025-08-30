@@ -64,7 +64,7 @@ class LevelBloc extends Bloc<LevelEvent, LevelState> {
       case 3:
         return 'Sayuran';
       case 4:
-        return 'Bagian Tubuh';
+        return 'Anggota Tubuh';
       case 5:
         return 'Makanan dan Minuman 1';
       case 6:
