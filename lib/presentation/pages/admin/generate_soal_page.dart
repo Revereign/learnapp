@@ -64,7 +64,7 @@ class _GenerateSoalPageState extends State<GenerateSoalPage> {
       case 4:
         return "Anggota Tubuh";
       case 5:
-        return "Makanan";
+        return "Makanan dan Minuman";
       case 6:
         return "Makanan dan Minuman";
       case 7:
@@ -84,13 +84,6 @@ class _GenerateSoalPageState extends State<GenerateSoalPage> {
     if (_selectedLevel == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Silakan pilih level terlebih dahulu")),
-      );
-      return;
-    }
-    
-    if (_levelMateri.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Tidak ada materi untuk level ini")),
       );
       return;
     }
@@ -199,16 +192,15 @@ Hanya tampilkan JSON array saja tanpa penjelasan tambahan.
                       ),
                     ),
                     const SizedBox(height: 12),
-                    DropdownButtonFormField<int>(
+                    DropdownButtonFormField<int?>(
                       value: _selectedLevel,
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
-                        labelText: "Level",
-                        hintText: "Pilih Level yang diinginkan",
+                        labelText: "Pilih materi yang diinginkan",
                       ),
                       items: List.generate(10, (index) {
                         final level = index + 1;
-                        return DropdownMenuItem(
+                        return DropdownMenuItem<int?>(
                           value: level,
                           child: Text("Level $level - ${_getLevelTopic(level)}"),
                         );
@@ -223,6 +215,10 @@ Hanya tampilkan JSON array saja tanpa penjelasan tambahan.
                     // Show materi count for selected level
                     BlocBuilder<VocabularyBloc, VocabularyState>(
                       builder: (context, state) {
+                        if (_selectedLevel == null) {
+                          return const SizedBox.shrink(); // Tidak tampilkan apa-apa saat belum pilih level
+                        }
+                        
                         if (state is VocabularyLoading) {
                           return const Text("Memuat materi...", style: TextStyle(color: Colors.grey));
                         } else if (state is VocabularyLoaded) {
@@ -250,8 +246,8 @@ Hanya tampilkan JSON array saja tanpa penjelasan tambahan.
             // Generate button
             ElevatedButton.icon(
               icon: const Icon(Icons.auto_fix_high),
-              onPressed: _isGenerating || _selectedLevel == null || _levelMateri.isEmpty ? null : _generateQuestions,
-              label: Text(_isGenerating ? "Generating..." : "Generate Soal ${_selectedLevel != null ? _getLevelTopic(_selectedLevel!) : ""}"),
+              onPressed: _isGenerating || _selectedLevel == null ? null : _generateQuestions,
+              label: Text(_isGenerating ? "Generating..." : "Generate Soal"),
             ),
             
             const SizedBox(height: 16),
