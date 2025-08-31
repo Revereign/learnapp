@@ -969,7 +969,7 @@ class _JadikanSempurnaGamePageState extends State<JadikanSempurnaGamePage>
                     border: Border.all(color: Colors.blue.shade300),
                   ),
                   child: Text(
-                    'Latih goresan: $selectedChar',
+                    'Tulis goresan: $selectedChar',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -992,7 +992,7 @@ class _JadikanSempurnaGamePageState extends State<JadikanSempurnaGamePage>
             child: Column(
               children: [
                 Text(
-                  'Tes Goresan',
+                  'Urutan Goresan',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -1001,7 +1001,7 @@ class _JadikanSempurnaGamePageState extends State<JadikanSempurnaGamePage>
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  'Tekan tombol di bawah untuk memulai tes goresan',
+                  'Tulislah urutan goresan dengan benar',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14,
@@ -1190,7 +1190,7 @@ class _JadikanSempurnaGamePageState extends State<JadikanSempurnaGamePage>
                   ),
                 ),
                 child: Text(
-                  controller.isQuizzing ? 'Stop Tes' : 'Mulai Tes',
+                  controller.isQuizzing ? 'Stop' : 'Mulai',
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
