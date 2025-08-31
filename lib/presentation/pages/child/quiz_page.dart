@@ -27,6 +27,7 @@ class _QuizPageState extends State<QuizPage>
   
   List<Map<String, dynamic>> _questions = [];
   bool _isLoading = true;
+  bool _hasEnoughQuestions = false;
   int _currentQuestionIndex = 0;
   int _score = 0;
   bool _quizCompleted = false;
@@ -80,21 +81,20 @@ class _QuizPageState extends State<QuizPage>
       final snapshot = await FirebaseFirestore.instance
           .collection('quiz_questions')
           .where('level', isEqualTo: widget.level)
-          .limit(10)
           .get();
 
-      if (snapshot.docs.length < 10) {
-        // Jika soal kurang dari 10, ambil semua yang ada
-        _questions = snapshot.docs
-            .map((doc) => doc.data())
-            .toList();
-      } else {
-        // Jika soal lebih dari 10, random 10 soal
+      if (snapshot.docs.length >= 10) {
+        // Jika soal 10 atau lebih, random 10 soal
         final allQuestions = snapshot.docs
             .map((doc) => doc.data())
             .toList();
         allQuestions.shuffle();
         _questions = allQuestions.take(10).toList();
+        _hasEnoughQuestions = true;
+      } else {
+        // Jika soal kurang dari 10, set questions kosong
+        _questions = [];
+        _hasEnoughQuestions = false;
       }
 
       setState(() {
@@ -104,6 +104,7 @@ class _QuizPageState extends State<QuizPage>
       print('Error loading questions: $e');
       setState(() {
         _isLoading = false;
+        _hasEnoughQuestions = false;
       });
     }
   }
@@ -341,19 +342,11 @@ class _QuizPageState extends State<QuizPage>
                       color: Colors.white,
                     ),
                   )
-                : _questions.isEmpty
-                    ? const Center(
-                        child: Text(
-                          'Tidak ada soal tersedia',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                          ),
-                        ),
-                      )
+                : !_hasEnoughQuestions
+                    ? _buildNotEnoughQuestionsView()
                     : Column(
-                        children: [
-                          // Header
+            children: [
+              // Header
                           _buildHeader(),
                           
                           // Progress Bar
@@ -379,7 +372,7 @@ class _QuizPageState extends State<QuizPage>
     );
   }
 
-  Widget _buildHeader() {
+    Widget _buildHeader() {
     return Container(
       padding: const EdgeInsets.all(20),
       child: Row(
@@ -397,7 +390,7 @@ class _QuizPageState extends State<QuizPage>
           ),
           Expanded(
             child: Text(
-              'Level ${widget.level}',
+              _hasEnoughQuestions ? 'Level ${widget.level}' : 'Level ${widget.level}',
               style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -416,6 +409,109 @@ class _QuizPageState extends State<QuizPage>
           const SizedBox(width: 48),
         ],
       ),
+    );
+  }
+
+  Widget _buildNotEnoughQuestionsView() {
+    return Column(
+      children: [
+        // Header
+        _buildHeader(),
+        
+        // Content
+        Expanded(
+          child: Center(
+            child: Container(
+              margin: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(30),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(25),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Icon
+                  Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      color: Colors.orange.shade100,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.info_outline,
+                      size: 60,
+                      color: Colors.orange.shade600,
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 25),
+                  
+                  // Title
+                  Text(
+                    'Soal Belum Tersedia',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.orange.shade700,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  
+                  const SizedBox(height: 15),
+                  
+                  // Message
+                  Text(
+                    'Untuk level ${widget.level}, diperlukan minimal 10 soal untuk memulai uji kemampuan.\n\nSilakan cek kembali nanti atau hubungi admin untuk menambahkan soal.',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey,
+                      height: 1.5,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  
+                  const SizedBox(height: 30),
+                  
+                  // Back Button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _audioManager.startBGM('menu_bgm.mp3');
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.indigo.shade600,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                      ),
+                      child: const Text(
+                        'Kembali',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -477,8 +573,8 @@ class _QuizPageState extends State<QuizPage>
         ),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
           const Icon(
             Icons.timer,
             color: Colors.white,
@@ -488,7 +584,7 @@ class _QuizPageState extends State<QuizPage>
           Text(
             '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}',
             style: const TextStyle(
-              color: Colors.white,
+                          color: Colors.white,
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
@@ -503,10 +599,10 @@ class _QuizPageState extends State<QuizPage>
       return const Center(
         child: Text(
           'Kuis Selesai!',
-          style: TextStyle(
+                        style: TextStyle(
             color: Colors.white,
             fontSize: 24,
-            fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.bold,
           ),
         ),
       );
@@ -523,7 +619,7 @@ class _QuizPageState extends State<QuizPage>
             width: double.infinity,
             padding: const EdgeInsets.all(25),
             decoration: BoxDecoration(
-              color: Colors.white,
+                          color: Colors.white,
               borderRadius: BorderRadius.circular(25),
               boxShadow: [
                 BoxShadow(
@@ -544,10 +640,10 @@ class _QuizPageState extends State<QuizPage>
                     color: Colors.indigo,
                   ),
                   textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
+                            ),
+                          ],
+                        ),
+                      ),
           
           const SizedBox(height: 30),
           
@@ -563,9 +659,9 @@ class _QuizPageState extends State<QuizPage>
               _buildAnswerOption('d', currentQuestion['d'] ?? ''),
               const SizedBox(height: 20), // Bottom padding for options
             ],
-          ),
-        ],
-      ),
+                            ),
+                          ],
+                        ),
     );
   }
 
@@ -623,20 +719,20 @@ class _QuizPageState extends State<QuizPage>
               child: Row(
                 children: [
                   // Option Circle
-                  Container(
+                      Container(
                     width: 40,
                     height: 40,
-                    decoration: BoxDecoration(
+                        decoration: BoxDecoration(
                       color: isSelected ? Colors.indigo : Colors.grey.shade200,
                       shape: BoxShape.circle,
-                    ),
+                        ),
                     child: Center(
                       child: Text(
                         option.toUpperCase(),
-                        style: TextStyle(
+                          style: TextStyle(
                           color: isSelected ? Colors.white : Colors.grey.shade600,
                           fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                            fontSize: 16,
                         ),
                       ),
                     ),
@@ -662,11 +758,11 @@ class _QuizPageState extends State<QuizPage>
                       isCorrect ? Icons.check_circle : Icons.cancel,
                       color: isCorrect ? Colors.green.shade600 : Colors.red.shade600,
                       size: 24,
-                    ),
-                ],
               ),
-            ),
+            ],
           ),
+        ),
+      ),
         );
       },
     );
