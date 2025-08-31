@@ -362,10 +362,12 @@ class _QuizPageState extends State<QuizPage>
                           // Timer
                           _buildTimer(),
                           
-                          // Question Content
-                          Expanded(
-                            child: _buildQuestionContent(),
-                          ),
+                                    // Question Content
+          Expanded(
+            child: SingleChildScrollView(
+              child: _buildQuestionContent(),
+            ),
+          ),
                           
                           // Bottom padding
                           const SizedBox(height: 20),
@@ -550,18 +552,17 @@ class _QuizPageState extends State<QuizPage>
           const SizedBox(height: 30),
           
           // Answer Options
-          Expanded(
-            child: ListView(
-              children: [
-                _buildAnswerOption('a', currentQuestion['a'] ?? ''),
-                const SizedBox(height: 15),
-                _buildAnswerOption('b', currentQuestion['b'] ?? ''),
-                const SizedBox(height: 15),
-                _buildAnswerOption('c', currentQuestion['c'] ?? ''),
-                const SizedBox(height: 15),
-                _buildAnswerOption('d', currentQuestion['d'] ?? ''),
-              ],
-            ),
+          Column(
+            children: [
+              _buildAnswerOption('a', currentQuestion['a'] ?? ''),
+              const SizedBox(height: 15),
+              _buildAnswerOption('b', currentQuestion['b'] ?? ''),
+              const SizedBox(height: 15),
+              _buildAnswerOption('c', currentQuestion['c'] ?? ''),
+              const SizedBox(height: 15),
+              _buildAnswerOption('d', currentQuestion['d'] ?? ''),
+              const SizedBox(height: 20), // Bottom padding for options
+            ],
           ),
         ],
       ),
