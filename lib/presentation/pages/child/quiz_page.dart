@@ -71,6 +71,9 @@ class _QuizPageState extends State<QuizPage>
   
   // Scroll controller for auto-scroll
   final ScrollController _scrollController = ScrollController();
+  
+  // Timer notifier for AnimatedBuilder
+  final ValueNotifier<int> _timerNotifier = ValueNotifier(0);
 
   @override
   void initState() {
@@ -180,10 +183,11 @@ class _QuizPageState extends State<QuizPage>
 
   void _startTimer() {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (!_quizCompleted) {
-        setState(() {
-          _elapsedTime++;
-        });
+      if (!_quizCompleted && mounted) {
+        // Update timer without rebuilding the entire widget
+        // Only update the elapsed time, let AnimatedBuilder handle the rebuild
+        _elapsedTime++;
+        _timerNotifier.value = _elapsedTime;
       }
     });
   }
@@ -1060,7 +1064,7 @@ class _QuizPageState extends State<QuizPage>
                             ? StrokeOrderAnimator(
                                 _strokeOrderController!,
                                 size: const Size(250, 250),
-                                key: UniqueKey(),
+                                key: ValueKey('stroke_order_${_currentQuestionIndex}_${_strokeOrderAttempts}'),
                               )
                             : Center(
                                 child: Text(
@@ -1161,6 +1165,7 @@ class _QuizPageState extends State<QuizPage>
     _strokeOrderController?.dispose();
     _httpClient.close();
     _scrollController.dispose();
+    _timerNotifier.dispose();
     super.dispose();
   }
 
@@ -1407,38 +1412,43 @@ class _QuizPageState extends State<QuizPage>
   }
 
   Widget _buildTimer() {
-    final minutes = _elapsedTime ~/ 60;
-    final seconds = _elapsedTime % 60;
-    
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.3),
-        ),
-      ),
-      child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-          const Icon(
-            Icons.timer,
-            color: Colors.white,
-            size: 20,
-          ),
-          const SizedBox(width: 8),
-          Text(
-            '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}',
-            style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-              fontWeight: FontWeight.bold,
+    return ValueListenableBuilder<int>(
+      valueListenable: _timerNotifier,
+      builder: (context, value, child) {
+        final minutes = _elapsedTime ~/ 60;
+        final seconds = _elapsedTime % 60;
+        
+        return Container(
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.2),
+            borderRadius: BorderRadius.circular(15),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.3),
             ),
           ),
-        ],
-      ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.timer,
+                color: Colors.white,
+                size: 20,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
