@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:learnapp/presentation/pages/admin/kelola_akun_page.dart';
 import 'package:learnapp/presentation/pages/admin/kelola_soal_kuis_page.dart';
+import 'package:learnapp/presentation/pages/admin/kelola_prompt_page.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/auth/auth_event.dart';
 import '../auth/login_page.dart';
@@ -101,7 +102,17 @@ class AdminDashboardPage extends StatelessWidget {
               },
               Colors.orange.shade400,
             ),
-            _buildMenuCard("Kelola Prompt LLM", Icons.code, () {}, Colors.purple.shade400),
+            _buildMenuCard(
+              "Kelola Prompt LLM",
+              Icons.code,
+              () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const KelolaPromptPage()),
+                );
+              },
+              Colors.purple.shade400,
+            ),
             _buildMenuCard("Logout", Icons.logout, () => _logout(context), Colors.red.shade400),
           ],
         ),

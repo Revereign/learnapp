@@ -4,8 +4,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:learnapp/data/datasources/child_auth_remote_data_source.dart';
 import 'package:learnapp/data/datasources/materi_remote_data_source.dart';
+import 'package:learnapp/data/datasources/prompt_remote_data_source.dart';
 import 'package:learnapp/data/repositories/child_auth_repository_impl.dart';
 import 'package:learnapp/data/repositories/materi_repository_impl.dart';
+import 'package:learnapp/data/repositories/prompt_repository_impl.dart';
 import 'package:learnapp/data/repositories/quiz_repository_impl.dart';
 import 'package:learnapp/data/repositories/user_repository_impl.dart';
 import 'package:learnapp/data/services/gemini_service.dart';
@@ -21,6 +23,8 @@ import 'package:learnapp/domain/usecases/materi/add_materi.dart';
 import 'package:learnapp/domain/usecases/materi/delete_materi.dart';
 import 'package:learnapp/domain/usecases/materi/get_all_materi.dart';
 import 'package:learnapp/domain/usecases/materi/update_materi.dart';
+import 'package:learnapp/domain/usecases/prompt/get_prompt.dart';
+import 'package:learnapp/domain/usecases/prompt/update_prompt.dart';
 import 'package:learnapp/domain/usecases/auth/save_user_to_firestore.dart';
 import 'package:learnapp/domain/usecases/parent/child_sign_up.dart';
 import 'package:learnapp/domain/usecases/parent/save_child_to_firestore.dart';
@@ -34,6 +38,7 @@ import 'package:learnapp/presentation/blocs/vocabulary/vocabulary_bloc.dart';
 import 'package:learnapp/presentation/blocs/game/game_bloc.dart';
 import 'package:learnapp/presentation/blocs/game/find_object_bloc.dart';
 import 'package:learnapp/presentation/blocs/game/jadikan_sempurna_bloc.dart';
+import 'package:learnapp/presentation/blocs/prompt/prompt_bloc.dart';
 import 'package:learnapp/core/routes/app_routes.dart';
 import 'firebase_options.dart';
 import 'presentation/blocs/auth/auth_bloc.dart';
@@ -212,6 +217,24 @@ class MyApp extends StatelessWidget {
             MateriRepositoryImpl(
               remoteDataSource: MateriRemoteDataSourceImpl(
                 firestore: FirebaseFirestore.instance,
+              ),
+            ),
+          ),
+        ),
+        BlocProvider(
+          create: (context) => PromptBloc(
+            getPrompt: GetPrompt(
+              PromptRepositoryImpl(
+                remoteDataSource: PromptRemoteDataSourceImpl(
+                  firestore: FirebaseFirestore.instance,
+                ),
+              ),
+            ),
+            updatePrompt: UpdatePrompt(
+              PromptRepositoryImpl(
+                remoteDataSource: PromptRemoteDataSourceImpl(
+                  firestore: FirebaseFirestore.instance,
+                ),
               ),
             ),
           ),
