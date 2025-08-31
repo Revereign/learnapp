@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:learnapp/core/services/audio_manager.dart';
 import 'package:learnapp/presentation/pages/child/latihan_membaca_page.dart';
 import 'package:learnapp/presentation/pages/child/latihan_goresan_page.dart';
+import 'package:learnapp/presentation/pages/child/buat_kalimat_page.dart';
 
 class LatihanPage extends StatefulWidget {
   final int level;
@@ -95,8 +96,17 @@ class _LatihanPageState extends State<LatihanPage>
           });
           break;
         case '/buat-kalimat':
-          // TODO: Implement Buat Kalimat page
-          print('Navigate to Buat Kalimat');
+          // Stop BGM when entering buat kalimat page
+          _audioManager.stopBGM();
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => BuatKalimatPage(level: widget.level),
+            ),
+          ).then((_) {
+            // Resume BGM when returning from buat kalimat page
+            _audioManager.startBGM('menu_bgm.mp3');
+          });
           break;
       }
     }

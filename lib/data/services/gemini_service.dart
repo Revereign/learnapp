@@ -87,4 +87,64 @@ class GeminiService {
     }
     throw FormatException("Tidak ditemukan format JSON array dalam respons Gemini.");
   }
+
+  Future<Map<String, String>> generateKalimat(String prompt) async {
+    if (apiKey.isEmpty) throw Exception("API Key Gemini belum diset di .env");
+
+    final url = Uri.parse(
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=$apiKey",
+    );
+
+    final body = {
+      "contents": [
+        {
+          "parts": [
+            {
+              "text": prompt
+            }
+          ]
+        }
+      ]
+    };
+
+    final response = await http.post(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(body),
+    );
+
+    if (response.statusCode == 200) {
+      final jsonData = jsonDecode(response.body);
+
+      try {
+        final textContent =
+        jsonData["candidates"][0]["content"]["parts"][0]["text"];
+        print("📥 Gemini Response for Kalimat:\n$textContent");
+
+        // Bersihkan dan pastikan JSON-nya valid
+        final cleaned = _extractValidJson(textContent);
+        final parsed = jsonDecode(cleaned) as Map<String, dynamic>;
+
+        return {
+          'kalimat': parsed['kalimat'] ?? '',
+          'pinyin': parsed['pinyin'] ?? '',
+          'arti': parsed['arti'] ?? '',
+        };
+      } catch (e) {
+        throw Exception("Format JSON dari Gemini tidak valid: $e");
+      }
+    } else {
+      throw Exception("Gagal generate kalimat: ${response.body}");
+    }
+  }
+
+  // Utility: ekstrak hanya JSON object dari string
+  String _extractValidJson(String text) {
+    final start = text.indexOf('{');
+    final end = text.lastIndexOf('}');
+    if (start != -1 && end != -1 && end > start) {
+      return text.substring(start, end + 1);
+    }
+    throw FormatException("Tidak ditemukan format JSON object dalam respons Gemini.");
+  }
 }
