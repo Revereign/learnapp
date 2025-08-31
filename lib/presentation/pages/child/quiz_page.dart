@@ -399,35 +399,53 @@ class _QuizPageState extends State<QuizPage>
       _isListening = false;
     });
     
-    // Auto-check answer if there's recognized text
+    // Check pronunciation after stopping
     if (_recognizedText.isNotEmpty) {
-      Future.delayed(const Duration(milliseconds: 500), () {
-        if (mounted) {
-          _checkReadingAnswer();
-        }
-      });
+      _checkReadingAnswer();
     }
   }
 
   void _checkReadingAnswer() {
     if (_currentReadingMateri == null) return;
     
-    setState(() {
-      _readingAttempts++;
-    });
+    // Check if pronunciation is correct
+    final correctAnswer = _currentReadingMateri!.kosakata;
+    final isCorrect = _recognizedText.toLowerCase().contains(
+      correctAnswer.toLowerCase(),
+    );
     
-    // Check if reading is correct (simple check for now)
-    if (_readingAttempts <= 2) {
+    if (isCorrect) {
+      // Correct answer - play sound and move to next question
       _audioManager.playSFX('correct_answer.mp3');
-      _nextQuestion();
-    } else {
-      _audioManager.playSFX('wrong_answer.mp3');
-      // Move to next question after max attempts
+      _score++; // Add score for correct answer
+      
+      // Move to next question after 1.5 seconds
       Future.delayed(const Duration(milliseconds: 1500), () {
         if (mounted) {
           _nextQuestion();
         }
       });
+    } else {
+      // Wrong answer - increment attempts
+      setState(() {
+        _readingAttempts++;
+      });
+      
+      _audioManager.playSFX('wrong_answer.mp3');
+      
+      if (_readingAttempts >= 3) {
+        // Max attempts reached, move to next question
+        Future.delayed(const Duration(milliseconds: 1500), () {
+          if (mounted) {
+            _nextQuestion();
+          }
+        });
+      } else {
+        // Still have attempts left, clear recognized text for retry
+        setState(() {
+          _recognizedText = '';
+        });
+      }
     }
   }
 
