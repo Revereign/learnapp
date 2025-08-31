@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:learnapp/core/services/audio_manager.dart';
+import 'package:learnapp/data/models/materi_model.dart';
+import 'package:speech_to_text/speech_to_text.dart';
+import 'package:pinyin/pinyin.dart';
 import 'dart:async';
 import 'dart:math';
 
@@ -24,8 +27,10 @@ class _QuizPageState extends State<QuizPage>
   late Animation<double> _bounceAnimation;
   
   final AudioManager _audioManager = AudioManager();
+  final SpeechToText _speechToText = SpeechToText();
   
   List<Map<String, dynamic>> _questions = [];
+  List<MateriModel> _materiList = [];
   bool _isLoading = true;
   bool _hasEnoughQuestions = false;
   int _currentQuestionIndex = 0;
@@ -36,12 +41,22 @@ class _QuizPageState extends State<QuizPage>
   String? _selectedAnswer;
   bool _showResult = false;
   bool _isCorrect = false;
+  
+  // Reading question variables
+  bool _isListening = false;
+  String _recognizedText = '';
+  bool _speechEnabled = false;
+  int _readingAttempts = 0;
+  bool _isReadingQuestion = false;
+  MateriModel? _currentReadingMateri;
 
   @override
   void initState() {
     super.initState();
     _setupAnimations();
+    _setupSpeechToText();
     _loadQuestions();
+    _loadMateri();
     _startTimer();
     
     // Stop BGM when entering quiz page
@@ -76,6 +91,13 @@ class _QuizPageState extends State<QuizPage>
     _animationController.forward();
   }
 
+  void _setupSpeechToText() async {
+    _speechEnabled = await _speechToText.initialize(
+      onError: (error) => print('Speech recognition error: $error'),
+      onStatus: (status) => print('Speech recognition status: $status'),
+    );
+  }
+
   Future<void> _loadQuestions() async {
     try {
       final snapshot = await FirebaseFirestore.instance
@@ -83,16 +105,21 @@ class _QuizPageState extends State<QuizPage>
           .where('level', isEqualTo: widget.level)
           .get();
 
-      if (snapshot.docs.length >= 10) {
-        // Jika soal 10 atau lebih, random 10 soal
+      if (snapshot.docs.length >= 8) { // Kurangi 2 karena soal 2 dan 5 adalah reading
+        // Jika soal 8 atau lebih, random 8 soal + 2 reading
         final allQuestions = snapshot.docs
             .map((doc) => doc.data())
             .toList();
         allQuestions.shuffle();
-        _questions = allQuestions.take(10).toList();
+        _questions = allQuestions.take(8).toList();
+        
+        // Tambahkan 2 soal reading di posisi 2 dan 5
+        _questions.insert(1, {'type': 'reading', 'index': 1}); // Soal 2
+        _questions.insert(4, {'type': 'reading', 'index': 4}); // Soal 5
+        
         _hasEnoughQuestions = true;
       } else {
-        // Jika soal kurang dari 10, set questions kosong
+        // Jika soal kurang dari 8, set questions kosong
         _questions = [];
         _hasEnoughQuestions = false;
       }
@@ -106,6 +133,23 @@ class _QuizPageState extends State<QuizPage>
         _isLoading = false;
         _hasEnoughQuestions = false;
       });
+    }
+  }
+
+  Future<void> _loadMateri() async {
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('materi')
+          .where('level', isEqualTo: widget.level)
+          .get();
+
+      setState(() {
+        _materiList = snapshot.docs
+            .map((doc) => MateriModel.fromDocumentSnapshot(doc))
+            .toList();
+      });
+    } catch (e) {
+      print('Error loading materi: $e');
     }
   }
 
@@ -128,15 +172,29 @@ class _QuizPageState extends State<QuizPage>
     });
 
     final currentQuestion = _questions[_currentQuestionIndex];
-    final correctAnswer = currentQuestion['jawaban'];
     
-    if (answer == correctAnswer) {
-      _score++;
-      _isCorrect = true;
-      _audioManager.playSFX('correct_answer.mp3');
+    // Check if it's a reading question
+    if (currentQuestion['type'] == 'reading') {
+      // For reading questions, check if reading attempts are within limit
+      if (_readingAttempts < 2) {
+        _score++;
+        _isCorrect = true;
+        _audioManager.playSFX('correct_answer.mp3');
+      } else {
+        _isCorrect = false;
+        _audioManager.playSFX('wrong_answer.mp3');
+      }
     } else {
-      _isCorrect = false;
-      _audioManager.playSFX('wrong_answer.mp3');
+      // For regular questions
+      final correctAnswer = currentQuestion['jawaban'];
+      if (answer == correctAnswer) {
+        _score++;
+        _isCorrect = true;
+        _audioManager.playSFX('correct_answer.mp3');
+      } else {
+        _isCorrect = false;
+        _audioManager.playSFX('wrong_answer.mp3');
+      }
     }
 
     // Show result for 1.5 seconds then move to next question
@@ -153,6 +211,10 @@ class _QuizPageState extends State<QuizPage>
         _currentQuestionIndex++;
         _selectedAnswer = null;
         _showResult = false;
+        _readingAttempts = 0;
+        _recognizedText = '';
+        _isReadingQuestion = false;
+        _currentReadingMateri = null;
       });
     } else {
       _completeQuiz();
@@ -306,8 +368,259 @@ class _QuizPageState extends State<QuizPage>
       _elapsedTime = 0;
       _selectedAnswer = null;
       _showResult = false;
+      _readingAttempts = 0;
+      _recognizedText = '';
+      _isReadingQuestion = false;
+      _currentReadingMateri = null;
     });
     _startTimer();
+  }
+
+  void _startListening() async {
+    if (!_speechEnabled) return;
+    
+    setState(() {
+      _isListening = true;
+    });
+    
+    await _speechToText.listen(
+      onResult: (result) {
+        setState(() {
+          _recognizedText = result.recognizedWords;
+        });
+      },
+      localeId: 'zh-CN',
+    );
+  }
+
+  void _stopListening() async {
+    await _speechToText.stop();
+    setState(() {
+      _isListening = false;
+    });
+    
+    // Auto-check answer if there's recognized text
+    if (_recognizedText.isNotEmpty) {
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted) {
+          _checkReadingAnswer();
+        }
+      });
+    }
+  }
+
+  void _checkReadingAnswer() {
+    if (_currentReadingMateri == null) return;
+    
+    setState(() {
+      _readingAttempts++;
+    });
+    
+    // Check if reading is correct (simple check for now)
+    if (_readingAttempts <= 2) {
+      _audioManager.playSFX('correct_answer.mp3');
+      _nextQuestion();
+    } else {
+      _audioManager.playSFX('wrong_answer.mp3');
+      // Move to next question after max attempts
+      Future.delayed(const Duration(milliseconds: 1500), () {
+        if (mounted) {
+          _nextQuestion();
+        }
+      });
+    }
+  }
+
+  String _getPinyinWithTones(String text) {
+    return PinyinHelper.getPinyinE(text, defPinyin: '', format: PinyinFormat.WITH_TONE_MARK);
+  }
+
+  Widget _buildReadingQuestion() {
+    // Get random materi for reading question
+    if (_currentReadingMateri == null && _materiList.isNotEmpty) {
+      _currentReadingMateri = _materiList[Random().nextInt(_materiList.length)];
+    }
+    
+    if (_currentReadingMateri == null) {
+      return const Center(
+        child: Text(
+          'Tidak ada materi tersedia',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+          ),
+        ),
+      );
+    }
+
+    return Container(
+      margin: const EdgeInsets.all(20),
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            // Vocabulary Card
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(25),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(25),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  // Hanzi
+                  Text(
+                    _currentReadingMateri!.kosakata,
+                    style: const TextStyle(
+                      fontSize: 80,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.indigo,
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 20),
+                  
+                  // Arti
+                  Text(
+                    _currentReadingMateri!.arti,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      color: Colors.indigo,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+            
+            const SizedBox(height: 30),
+            
+            // Reading Instructions
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.blue.shade50,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: Colors.blue.shade200),
+              ),
+              child: Column(
+                children: [
+                  Text(
+                    'Tekan dan tahan tombol mikrofon, lalu ucapkan Hanzi dari kata di atas',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.blue.shade600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            const SizedBox(height: 30),
+            
+            // Microphone Button
+            GestureDetector(
+              onTapDown: (_) => _startListening(),
+              onTapUp: (_) => _stopListening(),
+              onTapCancel: () => _stopListening(),
+              child: Container(
+                width: 100,
+                height: 100,
+                decoration: BoxDecoration(
+                  color: _isListening ? Colors.red.shade400 : Colors.green.shade400,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: (_isListening ? Colors.red : Colors.green).withOpacity(0.3),
+                      blurRadius: 15,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  _isListening ? Icons.mic : Icons.mic_none,
+                  color: Colors.white,
+                  size: 50,
+                ),
+              ),
+            ),
+            
+            const SizedBox(height: 20),
+            
+            // Recognized Text
+            if (_recognizedText.isNotEmpty)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: Colors.grey.shade300,
+                    width: 2,
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    const Text(
+                      'Yang kamu ucapkan:',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      _getPinyinWithTones(_recognizedText),
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.blue.shade700,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            
+            const SizedBox(height: 30),
+            
+            // Attempts Indicator
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              decoration: BoxDecoration(
+                color: Colors.blue.shade600,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: Colors.blue.shade700),
+              ),
+              child: Text(
+                'Kesalahan: $_readingAttempts/2',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
+            ),
+            
+            const SizedBox(height: 30),
+            
+            const SizedBox(height: 100), // Bottom padding
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -346,7 +659,7 @@ class _QuizPageState extends State<QuizPage>
                     ? _buildNotEnoughQuestionsView()
                     : Column(
             children: [
-              // Header
+                          // Header
                           _buildHeader(),
                           
                           // Progress Bar
@@ -354,7 +667,7 @@ class _QuizPageState extends State<QuizPage>
                           
                           // Timer
                           _buildTimer(),
-                          
+
                                     // Question Content
           Expanded(
             child: SingleChildScrollView(
@@ -594,21 +907,26 @@ class _QuizPageState extends State<QuizPage>
     );
   }
 
-  Widget _buildQuestionContent() {
+    Widget _buildQuestionContent() {
     if (_quizCompleted) {
       return const Center(
         child: Text(
           'Kuis Selesai!',
-                        style: TextStyle(
+          style: TextStyle(
             color: Colors.white,
             fontSize: 24,
-                          fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.bold,
           ),
         ),
       );
     }
 
     final currentQuestion = _questions[_currentQuestionIndex];
+    
+    // Check if it's a reading question
+    if (currentQuestion['type'] == 'reading') {
+      return _buildReadingQuestion();
+    }
     
     return Container(
       margin: const EdgeInsets.all(20),
@@ -619,7 +937,7 @@ class _QuizPageState extends State<QuizPage>
             width: double.infinity,
             padding: const EdgeInsets.all(25),
             decoration: BoxDecoration(
-                          color: Colors.white,
+              color: Colors.white,
               borderRadius: BorderRadius.circular(25),
               boxShadow: [
                 BoxShadow(
@@ -640,10 +958,10 @@ class _QuizPageState extends State<QuizPage>
                     color: Colors.indigo,
                   ),
                   textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
-                      ),
+                ),
+              ],
+            ),
+          ),
           
           const SizedBox(height: 30),
           
@@ -659,9 +977,9 @@ class _QuizPageState extends State<QuizPage>
               _buildAnswerOption('d', currentQuestion['d'] ?? ''),
               const SizedBox(height: 20), // Bottom padding for options
             ],
-                            ),
-                          ],
-                        ),
+          ),
+        ],
+      ),
     );
   }
 
