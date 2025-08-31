@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:learnapp/core/services/audio_manager.dart';
 import 'package:learnapp/presentation/blocs/auth/auth_bloc.dart';
 import 'package:learnapp/presentation/blocs/auth/auth_event.dart';
@@ -14,8 +13,6 @@ class MainMenuPage extends StatefulWidget {
 }
 
 class _MainMenuPageState extends State<MainMenuPage> {
-  String? _backgroundImageUrl;
-  bool _isLoading = true;
   final AudioManager _audioManager = AudioManager();
 
   @override
@@ -31,21 +28,10 @@ class _MainMenuPageState extends State<MainMenuPage> {
         // Start BGM after initialization is complete
         _audioManager.startBGM('menu_bgm.mp3');
       });
-      
-      // Load background image from Firebase Storage
-      final imageUrl = await FirebaseStorage.instance
-          .ref('main_menu/background.jpg')
-          .getDownloadURL();
-
-      setState(() {
-        _backgroundImageUrl = imageUrl;
-        _isLoading = false;
-      });
 
       debugPrint('Assets loaded successfully');
     } catch (e) {
       debugPrint('Error loading assets: $e');
-      setState(() => _isLoading = false);
     }
   }
 
@@ -78,47 +64,15 @@ class _MainMenuPageState extends State<MainMenuPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _isLoading
-          ? const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 16),
-                  Text(
-                    'Loading...',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
-              ),
-            )
-          : Stack(
+      resizeToAvoidBottomInset: false,
+      body: Stack(
               fit: StackFit.expand,
               children: [
-                // Background image from Firebase
-                if (_backgroundImageUrl != null)
-                  Image.network(
-                    _backgroundImageUrl!,
-                    fit: BoxFit.cover,
-                    loadingBuilder: (context, child, loadingProgress) =>
-                        loadingProgress == null
-                            ? child
-                            : const Center(child: CircularProgressIndicator()),
-                    errorBuilder: (_, __, ___) => Container(
-                      color: Colors.blue[900],
-                      child: const Center(
-                        child: Text(
-                          'Gagal memuat gambar',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  )
-                else
-                  Container(
+                // Background image from assets
+                Image.asset(
+                  'assets/images/background.jpg',
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => Container(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
@@ -130,6 +84,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
                       ),
                     ),
                   ),
+                ),
                 
                 // Content overlay
                 SafeArea(
