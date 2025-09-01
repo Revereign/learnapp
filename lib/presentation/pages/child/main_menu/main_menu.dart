@@ -132,6 +132,15 @@ class _MainMenuPageState extends State<MainMenuPage> {
                         const SizedBox(height: 20),
                         
                         _buildMenuButton(
+                          'Leaderboard',
+                          Icons.leaderboard,
+                          () => _onButtonTap('/leaderboard'),
+                          Colors.purple,
+                        ),
+                        
+                        const SizedBox(height: 20),
+                        
+                        _buildMenuButton(
                           'Settings',
                           Icons.settings,
                           () => _onButtonTap('/settings'),

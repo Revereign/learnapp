@@ -7,6 +7,8 @@ import '../../presentation/pages/admin/admin_dashboard_page.dart';
 import '../../presentation/pages/admin/add_sample_data_page.dart';
 import '../../presentation/pages/parent/dashboard_page.dart' as parent;
 import '../../presentation/pages/child/jadikan_sempurna_game_page.dart';
+import '../../presentation/pages/child/leaderboard/leaderboard_level_selection_page.dart';
+import '../../presentation/pages/child/leaderboard/leaderboard_page.dart';
 
 class AppRoutes {
   static const String login = '/login';
@@ -17,6 +19,7 @@ class AppRoutes {
   static const String addSampleData = '/add-sample-data';
   static const String parentDashboard = '/parent-dashboard';
   static const String jadikanSempurna = '/jadikan-sempurna';
+  static const String leaderboard = '/leaderboard';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -37,6 +40,10 @@ class AppRoutes {
       case jadikanSempurna:
         return MaterialPageRoute(
           builder: (_) => const JadikanSempurnaGamePage(level: 4),
+        );
+      case leaderboard:
+        return MaterialPageRoute(
+          builder: (_) => const LeaderboardLevelSelectionPage(),
         );
       default:
         return MaterialPageRoute(
