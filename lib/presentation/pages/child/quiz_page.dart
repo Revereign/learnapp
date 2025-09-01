@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:learnapp/core/services/audio_manager.dart';
 import 'package:learnapp/data/models/materi_model.dart';
+import 'package:learnapp/data/services/quiz_score_service.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:pinyin/pinyin.dart';
 import 'package:stroke_order_animator/stroke_order_animator.dart';
@@ -74,6 +75,13 @@ class _QuizPageState extends State<QuizPage>
   
   // Timer notifier for AnimatedBuilder
   final ValueNotifier<int> _timerNotifier = ValueNotifier(0);
+  
+  // Quiz score service
+  final QuizScoreService _quizScoreService = QuizScoreService();
+  
+  // Track if score or time was updated
+  bool _scoreUpdated = false;
+  bool _timeUpdated = false;
 
   @override
   void initState() {
@@ -154,6 +162,8 @@ class _QuizPageState extends State<QuizPage>
 
       setState(() {
         _isLoading = false;
+        _scoreUpdated = false;
+        _timeUpdated = false;
       });
     } catch (e) {
       print('Error loading questions: $e');
@@ -276,8 +286,53 @@ class _QuizPageState extends State<QuizPage>
     });
     _timer?.cancel();
     
+    // Update quiz score and time in Firestore
+    _updateQuizResults();
+    
     // Show completion dialog
     _showCompletionDialog();
+  }
+
+  /// Update quiz score and time in Firestore
+  Future<void> _updateQuizResults() async {
+    try {
+      // Update quiz score if higher
+      _scoreUpdated = await _quizScoreService.updateQuizScore(widget.level, _score);
+      
+      // Update quiz time if faster
+      _timeUpdated = await _quizScoreService.updateQuizTime(widget.level, _elapsedTime);
+    } catch (e) {
+      print('Error updating quiz results: $e');
+    }
+  }
+
+  /// Reset quiz state
+  void _resetQuiz() {
+    setState(() {
+      _currentQuestionIndex = 0;
+      _score = 0;
+      _quizCompleted = false;
+      _elapsedTime = 0;
+      _selectedAnswer = null;
+      _showResult = false;
+      _isCorrect = false;
+      _readingAttempts = 0;
+      _recognizedText = '';
+      _isReadingQuestion = false;
+      _currentReadingMateri = null;
+      _strokeOrderAttempts = 0;
+      _currentStrokeOrderMateri = null;
+      _selectedCharacter = '';
+      _isTestActive = false;
+      _strokeOrderPoints.clear();
+      _isQuizMode = false;
+      _isScrollDisabled = false;
+      _scoreUpdated = false;
+      _timeUpdated = false;
+    });
+    
+    // Restart timer
+    _startTimer();
   }
 
   void _showCompletionDialog() {
@@ -332,7 +387,43 @@ class _QuizPageState extends State<QuizPage>
                   ),
                 ),
                 
-                const SizedBox(height: 20),
+                const SizedBox(height: 10),
+                
+                // Update indicators
+                if (_scoreUpdated || _timeUpdated) ...[
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.green.shade100,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.green.shade300),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.star,
+                          color: Colors.green.shade600,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          _scoreUpdated && _timeUpdated
+                              ? 'Skor dan waktu terbaik! 🎉'
+                              : _scoreUpdated
+                                  ? 'Skor terbaik! 🏆'
+                                  : 'Waktu terbaik! ⚡',
+                          style: TextStyle(
+                            color: Colors.green.shade700,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                ],
                 
                 // Message
                 Text(
@@ -380,7 +471,7 @@ class _QuizPageState extends State<QuizPage>
                       child: ElevatedButton(
                         onPressed: () {
                           Navigator.of(context).pop();
-                          _restartQuiz();
+                          _resetQuiz();
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.green.shade600,
