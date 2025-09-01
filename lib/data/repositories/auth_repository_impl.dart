@@ -25,6 +25,24 @@ class AuthRepositoryImpl implements AuthRepository {
       email: userModel.email,
       name: data['name'] ?? '',
       role: data['role'] ?? '',
+      parentUid: data['parentUid'],
+      deletedAt: data['deletedAt'] != null
+          ? (data['deletedAt'] as Timestamp).toDate()
+          : null,
+      gameScore: data['gameScore'] != null
+          ? List<int>.from(data['gameScore'])
+          : null,
+      quizScore: data['quizScore'] != null
+          ? List<int>.from(data['quizScore'])
+          : null,
+      quizTime: data['quizTime'] != null
+          ? List<int>.from(data['quizTime'])
+          : null,
+      achieve: data['achieve'] != null
+          ? List<bool>.from(data['achieve'])
+          : null,
+      todayTime: data['todayTime'],
+      allTime: data['allTime'],
     );
   }
 
@@ -41,6 +59,14 @@ class AuthRepositoryImpl implements AuthRepository {
       'name': user.name,
       'role': user.role,
       'createdAt': FieldValue.serverTimestamp(),
+      'parentUid': user.parentUid,
+      'deletedAt': user.deletedAt,
+      'gameScore': user.gameScore ?? List.filled(10, 0),
+      'quizScore': user.quizScore ?? List.filled(10, 0),
+      'quizTime': user.quizTime ?? List.filled(10, 0),
+      'achieve': user.achieve ?? List.filled(6, false),
+      'todayTime': user.todayTime ?? 0,
+      'allTime': user.allTime ?? 0,
     });
   }
 

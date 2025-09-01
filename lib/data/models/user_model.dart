@@ -8,6 +8,12 @@ class UserModel {
   final String? role;
   final String? parentUid;
   final DateTime? deletedAt; // Tambahan untuk soft delete
+  final List<int>? gameScore;
+  final List<int>? quizScore;
+  final List<int>? quizTime;
+  final List<bool>? achieve;
+  final int? todayTime;
+  final int? allTime;
 
   UserModel({
     required this.uid,
@@ -16,6 +22,12 @@ class UserModel {
     this.role,
     this.parentUid,
     this.deletedAt,
+    this.gameScore,
+    this.quizScore,
+    this.quizTime,
+    this.achieve,
+    this.todayTime,
+    this.allTime,
   });
 
   factory UserModel.fromFirebaseUser(String uid, String email) {
@@ -36,6 +48,20 @@ class UserModel {
       deletedAt: data["deletedAt"] != null
           ? (data["deletedAt"] as Timestamp).toDate()
           : null,
+      gameScore: data["gameScore"] != null
+          ? List<int>.from(data["gameScore"])
+          : null,
+      quizScore: data["quizScore"] != null
+          ? List<int>.from(data["quizScore"])
+          : null,
+      quizTime: data["quizTime"] != null
+          ? List<int>.from(data["quizTime"])
+          : null,
+      achieve: data["achieve"] != null
+          ? List<bool>.from(data["achieve"])
+          : null,
+      todayTime: data["todayTime"],
+      allTime: data["allTime"],
     );
   }
 
@@ -44,6 +70,12 @@ class UserModel {
     "name": name,
     "role": role,
     "deletedAt": deletedAt,
+    "gameScore": gameScore,
+    "quizScore": quizScore,
+    "quizTime": quizTime,
+    "achieve": achieve,
+    "todayTime": todayTime,
+    "allTime": allTime,
   };
 
   UserEntity toEntity() {
@@ -54,6 +86,12 @@ class UserModel {
       role: role,
       parentUid: parentUid,
       deletedAt: deletedAt,
+      gameScore: gameScore,
+      quizScore: quizScore,
+      quizTime: quizTime,
+      achieve: achieve,
+      todayTime: todayTime,
+      allTime: allTime,
     );
   }
 
@@ -65,6 +103,12 @@ class UserModel {
       role: entity.role,
       parentUid: entity.parentUid,
       deletedAt: entity.deletedAt,
+      gameScore: entity.gameScore,
+      quizScore: entity.quizScore,
+      quizTime: entity.quizTime,
+      achieve: entity.achieve,
+      todayTime: entity.todayTime,
+      allTime: entity.allTime,
     );
   }
 }

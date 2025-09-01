@@ -22,6 +22,12 @@ class ChildAuthRepositoryImpl implements ChildAuthRepository {
       'role': user.role,
       'parentUid': user.parentUid,
       'createdAt': FieldValue.serverTimestamp(),
+      'gameScore': List.filled(10, 0), // Default 0 untuk 10 level
+      'quizScore': List.filled(10, 0), // Default 0 untuk 10 level
+      'quizTime': List.filled(10, 0), // Default 0 untuk 10 level
+      'achieve': List.filled(6, false), // Default false untuk 6 achievement
+      'todayTime': 0, // Default 0
+      'allTime': 0, // Default 0
     });
   }
 }
