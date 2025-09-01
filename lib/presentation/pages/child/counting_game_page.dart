@@ -1225,93 +1225,77 @@ class _CountingGamePageState extends State<CountingGamePage>
             const SizedBox(height: 20),
             
             // Result card
-            AnimatedBuilder(
-              animation: _starAnimation,
-              builder: (context, child) {
-                return Transform.scale(
-                  scale: _starAnimation.value,
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: isPassed
-                            ? [
-                                Colors.green.withOpacity(0.8),
-                                Colors.green.withOpacity(0.6),
-                              ]
-                            : [
-                                Colors.orange.withOpacity(0.8),
-                                Colors.orange.withOpacity(0.6),
-                              ],
-                      ),
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: (isPassed ? Colors.green : Colors.orange).withOpacity(0.3),
-                          blurRadius: 10,
-                          offset: const Offset(0, 5),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        AnimatedBuilder(
-                          animation: _bounceAnimation,
-                          builder: (context, child) {
-                            return Transform.scale(
-                              scale: _bounceAnimation.value,
-                              child: Icon(
-                                isPassed ? Icons.celebration : Icons.school,
-                                color: Colors.white,
-                                size: 48,
-                              ),
-                            );
-                          },
-                        ),
-                        const SizedBox(height: 16),
-                                                 Text(
-                           isPassed ? 'Selamat!' : 'Belajar Lagi',
-                           style: const TextStyle(
-                             color: Colors.white,
-                             fontSize: 28,
-                             fontWeight: FontWeight.bold,
-                           ),
-                         ),
-                        const SizedBox(height: 12),
-                        Text(
-                          isPassed 
-                              ? 'Kamu berhasil menyelesaikan permainan!'
-                              : 'Jangan menyerah, terus belajar ya!',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 20),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                                                     child: Text(
-                             'Skor: $score/10',
-                             style: const TextStyle(
-                               color: Colors.white,
-                               fontSize: 24,
-                               fontWeight: FontWeight.bold,
-                             ),
-                           ),
-                        ),
-                      ],
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: isPassed
+                      ? [
+                          Colors.green.withOpacity(0.8),
+                          Colors.green.withOpacity(0.6),
+                        ]
+                      : [
+                          Colors.red.withOpacity(0.8),
+                          Colors.red.withOpacity(0.6),
+                        ],
+                ),
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: (isPassed ? Colors.green : Colors.orange).withOpacity(0.3),
+                    blurRadius: 10,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  Icon(
+                    isPassed ? Icons.celebration : Icons.school,
+                    color: Colors.white,
+                    size: 48,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    isPassed ? 'Selamat!' : 'Belajar Lagi',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                );
-              },
+                  const SizedBox(height: 12),
+                  Text(
+                    isPassed 
+                        ? 'Kamu berhasil menyelesaikan permainan!'
+                        : 'Jangan menyerah, terus belajar ya!',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 20),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      'Skor: $score/10',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
             
             const SizedBox(height: 30),

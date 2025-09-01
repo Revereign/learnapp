@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import '../../../domain/entities/materi.dart';
 import '../../../data/repositories/materi_repository_impl.dart';
+import '../../../data/services/game_score_service.dart';
 
 // Events
 abstract class JadikanSempurnaEvent extends Equatable {
@@ -65,6 +66,7 @@ class JadikanSempurnaLoaded extends JadikanSempurnaState {
   final JadikanSempurnaQuestion currentQuestion;
   final int readingAttempts;
   final int strokeOrderAttempts;
+  final int level;
 
   const JadikanSempurnaLoaded({
     required this.questions,
@@ -77,6 +79,7 @@ class JadikanSempurnaLoaded extends JadikanSempurnaState {
     required this.currentQuestion,
     required this.readingAttempts,
     required this.strokeOrderAttempts,
+    required this.level,
   });
 
   @override
@@ -91,6 +94,7 @@ class JadikanSempurnaLoaded extends JadikanSempurnaState {
         currentQuestion,
         readingAttempts,
         strokeOrderAttempts,
+        level,
       ];
 
   JadikanSempurnaLoaded copyWith({
@@ -104,6 +108,7 @@ class JadikanSempurnaLoaded extends JadikanSempurnaState {
     JadikanSempurnaQuestion? currentQuestion,
     int? readingAttempts,
     int? strokeOrderAttempts,
+    int? level,
   }) {
     return JadikanSempurnaLoaded(
       questions: questions ?? this.questions,
@@ -116,6 +121,7 @@ class JadikanSempurnaLoaded extends JadikanSempurnaState {
       currentQuestion: currentQuestion ?? this.currentQuestion,
       readingAttempts: readingAttempts ?? this.readingAttempts,
       strokeOrderAttempts: strokeOrderAttempts ?? this.strokeOrderAttempts,
+      level: level ?? this.level,
     );
   }
 }
@@ -146,6 +152,7 @@ enum QuestionType { reading, strokeOrder }
 // BLOC
 class JadikanSempurnaBloc extends Bloc<JadikanSempurnaEvent, JadikanSempurnaState> {
   final MateriRepositoryImpl _materiRepository;
+  final GameScoreService _gameScoreService = GameScoreService();
   final Random _random = Random();
 
   JadikanSempurnaBloc(this._materiRepository) : super(JadikanSempurnaInitial()) {
@@ -222,6 +229,7 @@ class JadikanSempurnaBloc extends Bloc<JadikanSempurnaEvent, JadikanSempurnaStat
         currentQuestion: questions[0],
         readingAttempts: 0,
         strokeOrderAttempts: 0,
+        level: event.level,
       ));
     } catch (e) {
       emit(JadikanSempurnaError('Gagal memuat game: $e'));
@@ -247,6 +255,9 @@ class JadikanSempurnaBloc extends Bloc<JadikanSempurnaEvent, JadikanSempurnaStat
         ));
       } else {
         // Game completed
+        // Update game score before emitting completion state
+        _updateGameScore(currentState.score, currentState.level);
+        
         emit(currentState.copyWith(
           isGameCompleted: true,
         ));
@@ -334,6 +345,15 @@ class JadikanSempurnaBloc extends Bloc<JadikanSempurnaEvent, JadikanSempurnaStat
           ));
         }
       }
+    }
+  }
+
+  /// Update game score in Firestore if the new score is higher
+  Future<void> _updateGameScore(int score, int level) async {
+    try {
+      await _gameScoreService.updateGameScore(level, score);
+    } catch (e) {
+      print('Error updating game score: $e');
     }
   }
 

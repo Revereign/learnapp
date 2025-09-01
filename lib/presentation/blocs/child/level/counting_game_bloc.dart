@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import '../../../../domain/entities/materi.dart';
 import '../../../../domain/usecases/materi/get_materi_by_level.dart';
+import '../../../../data/services/game_score_service.dart';
 
 // Events
 abstract class CountingGameEvent extends Equatable {
@@ -129,6 +130,7 @@ class CountingQuestion {
 // Bloc
 class CountingGameBloc extends Bloc<CountingGameEvent, CountingGameState> {
   final GetMateriByLevel getMateriByLevel;
+  final GameScoreService _gameScoreService = GameScoreService();
   
   CountingGameBloc({
     required this.getMateriByLevel,
@@ -214,6 +216,11 @@ class CountingGameBloc extends Bloc<CountingGameEvent, CountingGameState> {
       // Check if game is complete
       final isGameComplete = event.questionIndex == 9; // Last question (0-9)
       
+      // Update game score if game is complete
+      if (isGameComplete) {
+        _updateGameScore(newScore, currentState.availableFruits.first.level);
+      }
+      
       emit(CountingGameLoaded(
         questions: updatedQuestions,
         availableFruits: currentState.availableFruits,
@@ -248,6 +255,15 @@ class CountingGameBloc extends Bloc<CountingGameEvent, CountingGameState> {
     Emitter<CountingGameState> emit,
   ) {
     emit(CountingGameInitial());
+  }
+
+  /// Update game score in Firestore if the new score is higher
+  Future<void> _updateGameScore(int score, int level) async {
+    try {
+      await _gameScoreService.updateGameScore(level, score);
+    } catch (e) {
+      print('Error updating game score: $e');
+    }
   }
   
   List<CountingQuestion> _generateQuestions(List<Materi> materiList) {

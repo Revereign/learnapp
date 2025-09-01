@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import '../../../domain/entities/materi.dart';
 import '../../../domain/usecases/materi/get_materi_by_level.dart';
+import '../../../data/services/game_score_service.dart';
 import 'dart:math';
 
 part 'find_object_event.dart';
@@ -10,6 +11,7 @@ part 'find_object_state.dart';
 
 class Level3FindObjectBloc extends Bloc<Level3FindObjectEvent, Level3FindObjectState> {
   final GetMateriByLevel getMateriByLevel;
+  final GameScoreService _gameScoreService = GameScoreService();
   final Random _random = Random();
 
   Level3FindObjectBloc({required this.getMateriByLevel}) : super(Level3FindObjectInitial()) {
@@ -53,6 +55,7 @@ class Level3FindObjectBloc extends Bloc<Level3FindObjectEvent, Level3FindObjectS
         lives: 4,
         answeredQuestions: [],
         lastAnswer: null,
+        level: event.level,
       ));
       
       // Start first round
@@ -66,6 +69,9 @@ class Level3FindObjectBloc extends Bloc<Level3FindObjectEvent, Level3FindObjectS
     final currentState = state;
     if (currentState is Level3GameLoaded) {
       if (currentState.answeredQuestions.length >= currentState.totalQuestions) {
+        // Update game score before emitting completion state
+        _updateGameScore(currentState.score, currentState.level);
+        
         emit(Level3GameCompleted(
           score: currentState.score,
           totalQuestions: currentState.totalQuestions,
@@ -124,6 +130,9 @@ class Level3FindObjectBloc extends Bloc<Level3FindObjectEvent, Level3FindObjectS
         
         if (newLives <= 0) {
           // Game over when lives are exhausted
+          // Update game score before emitting game over state
+          _updateGameScore(currentState.score, currentState.level);
+          
           emit(Level3GameOver(
             score: currentState.score,
             totalQuestions: currentState.totalQuestions,
@@ -139,6 +148,15 @@ class Level3FindObjectBloc extends Bloc<Level3FindObjectEvent, Level3FindObjectS
           ));
         }
       }
+    }
+  }
+
+  /// Update game score in Firestore if the new score is higher
+  Future<void> _updateGameScore(int score, int level) async {
+    try {
+      await _gameScoreService.updateGameScore(level, score);
+    } catch (e) {
+      print('Error updating game score: $e');
     }
   }
 

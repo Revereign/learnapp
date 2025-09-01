@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import '../../../domain/entities/materi.dart';
 import '../../../domain/usecases/materi/get_materi_by_level.dart';
+import '../../../data/services/game_score_service.dart';
 import 'dart:math';
 
 part 'game_event.dart';
@@ -9,6 +10,7 @@ part 'game_state.dart';
 
 class GameBloc extends Bloc<GameEvent, GameState> {
   final GetMateriByLevel getMateriByLevel;
+  final GameScoreService _gameScoreService = GameScoreService();
   final Random _random = Random();
 
   GameBloc({required this.getMateriByLevel}) : super(GameInitial()) {
@@ -16,6 +18,23 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     on<StartNewRound>(_onStartNewRound);
     on<CheckAnswer>(_onCheckAnswer);
     on<PlayAudio>(_onPlayAudio);
+  }
+
+  /// Update game score in Firestore if the new score is higher
+  Future<void> _updateGameScore(int score) async {
+    try {
+      // Get the current level from the state
+      final currentState = state;
+      if (currentState is GameLoaded) {
+        // Extract level from the first materi (assuming all materi are from the same level)
+        if (currentState.allMateri.isNotEmpty) {
+          final level = currentState.allMateri.first.level;
+          await _gameScoreService.updateGameScore(level, score);
+        }
+      }
+    } catch (e) {
+      print('Error updating game score: $e');
+    }
   }
 
   Future<void> _onLoadGame(LoadGame event, Emitter<GameState> emit) async {
@@ -51,6 +70,9 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     final currentState = state;
     if (currentState is GameLoaded) {
       if (currentState.remainingMateri.isEmpty) {
+        // Update game score before emitting completion state
+        _updateGameScore(currentState.score);
+        
         emit(GameCompleted(
           score: currentState.score,
           totalQuestions: currentState.totalQuestions,
@@ -103,6 +125,9 @@ class GameBloc extends Bloc<GameEvent, GameState> {
         
         if (newLives <= 0) {
           // Game over when lives are exhausted
+          // Update game score before emitting game over state
+          _updateGameScore(currentState.score);
+          
           emit(GameOver(
             score: currentState.score,
             totalQuestions: currentState.totalQuestions,

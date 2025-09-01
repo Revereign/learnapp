@@ -20,6 +20,7 @@ class Level3GameLoaded extends Level3FindObjectState {
   final int totalQuestions;
   final int lives;
   final List<String> answeredQuestions;
+  final int level;
 
   const Level3GameLoaded({
     required this.allMateri,
@@ -30,6 +31,7 @@ class Level3GameLoaded extends Level3FindObjectState {
     required this.totalQuestions,
     required this.lives,
     required this.answeredQuestions,
+    required this.level,
   });
 
   Level3GameLoaded copyWith({
@@ -41,6 +43,7 @@ class Level3GameLoaded extends Level3FindObjectState {
     int? totalQuestions,
     int? lives,
     List<String>? answeredQuestions,
+    int? level,
   }) {
     return Level3GameLoaded(
       allMateri: allMateri ?? this.allMateri,
@@ -51,6 +54,7 @@ class Level3GameLoaded extends Level3FindObjectState {
       totalQuestions: totalQuestions ?? this.totalQuestions,
       lives: lives ?? this.lives,
       answeredQuestions: answeredQuestions ?? this.answeredQuestions,
+      level: level ?? this.level,
     );
   }
 
@@ -64,6 +68,7 @@ class Level3GameLoaded extends Level3FindObjectState {
     totalQuestions,
     lives,
     answeredQuestions,
+    level,
   ];
 }
 
