@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:learnapp/core/services/audio_manager.dart';
 import 'package:learnapp/data/models/materi_model.dart';
 import 'package:learnapp/data/services/quiz_score_service.dart';
+import 'package:learnapp/domain/usecases/auth/check_badge_achievements.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:pinyin/pinyin.dart';
 import 'package:stroke_order_animator/stroke_order_animator.dart';
@@ -78,6 +79,9 @@ class _QuizPageState extends State<QuizPage>
   
   // Quiz score service
   final QuizScoreService _quizScoreService = QuizScoreService();
+  
+  // Badge checking service
+  final CheckBadgeAchievements _checkBadgeAchievements = CheckBadgeAchievements();
   
   // Track if score or time was updated
   bool _scoreUpdated = false;
@@ -301,6 +305,9 @@ class _QuizPageState extends State<QuizPage>
       
       // Update quiz time if faster
       _timeUpdated = await _quizScoreService.updateQuizTime(widget.level, _elapsedTime);
+      
+      // Check badge achievements after updating quiz results
+      await _checkBadgeAchievements.call();
     } catch (e) {
       print('Error updating quiz results: $e');
     }

@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import '../../../domain/entities/materi.dart';
+import '../../../domain/usecases/auth/check_badge_achievements.dart';
 import '../../../data/repositories/materi_repository_impl.dart';
 import '../../../data/services/game_score_service.dart';
 
@@ -153,6 +154,7 @@ enum QuestionType { reading, strokeOrder }
 class JadikanSempurnaBloc extends Bloc<JadikanSempurnaEvent, JadikanSempurnaState> {
   final MateriRepositoryImpl _materiRepository;
   final GameScoreService _gameScoreService = GameScoreService();
+  final CheckBadgeAchievements _checkBadgeAchievements = CheckBadgeAchievements();
   final Random _random = Random();
 
   JadikanSempurnaBloc(this._materiRepository) : super(JadikanSempurnaInitial()) {
@@ -352,6 +354,9 @@ class JadikanSempurnaBloc extends Bloc<JadikanSempurnaEvent, JadikanSempurnaStat
   Future<void> _updateGameScore(int score, int level) async {
     try {
       await _gameScoreService.updateGameScore(level, score);
+      
+      // Check badge achievements after updating game score
+      await _checkBadgeAchievements.call();
     } catch (e) {
       print('Error updating game score: $e');
     }

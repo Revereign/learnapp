@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'medal_viewing_page.dart';
+import 'video_special_page.dart';
 
 class AchievementMainPage extends StatelessWidget {
   const AchievementMainPage({super.key});
@@ -95,11 +96,10 @@ class AchievementMainPage extends StatelessWidget {
                   Icons.video_library,
                   Colors.green,
                   () {
-                    // TODO: Implement video special page
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Fitur Video Spesial akan segera hadir!'),
-                        backgroundColor: Colors.orange,
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const VideoSpecialPage(),
                       ),
                     );
                   },

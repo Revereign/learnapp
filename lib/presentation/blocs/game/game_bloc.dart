@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import '../../../domain/entities/materi.dart';
 import '../../../domain/usecases/materi/get_materi_by_level.dart';
+import '../../../domain/usecases/auth/check_badge_achievements.dart';
 import '../../../data/services/game_score_service.dart';
 import 'dart:math';
 
@@ -11,6 +12,7 @@ part 'game_state.dart';
 class GameBloc extends Bloc<GameEvent, GameState> {
   final GetMateriByLevel getMateriByLevel;
   final GameScoreService _gameScoreService = GameScoreService();
+  final CheckBadgeAchievements _checkBadgeAchievements = CheckBadgeAchievements();
   final Random _random = Random();
 
   GameBloc({required this.getMateriByLevel}) : super(GameInitial()) {
@@ -30,6 +32,9 @@ class GameBloc extends Bloc<GameEvent, GameState> {
         if (currentState.allMateri.isNotEmpty) {
           final level = currentState.allMateri.first.level;
           await _gameScoreService.updateGameScore(level, score);
+          
+          // Check badge achievements after updating game score
+          await _checkBadgeAchievements.call();
         }
       }
     } catch (e) {

@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import '../../../domain/entities/materi.dart';
 import '../../../domain/usecases/materi/get_materi_by_level.dart';
+import '../../../domain/usecases/auth/check_badge_achievements.dart';
 import '../../../data/services/game_score_service.dart';
 import 'dart:math';
 
@@ -12,6 +13,7 @@ part 'find_object_state.dart';
 class Level3FindObjectBloc extends Bloc<Level3FindObjectEvent, Level3FindObjectState> {
   final GetMateriByLevel getMateriByLevel;
   final GameScoreService _gameScoreService = GameScoreService();
+  final CheckBadgeAchievements _checkBadgeAchievements = CheckBadgeAchievements();
   final Random _random = Random();
 
   Level3FindObjectBloc({required this.getMateriByLevel}) : super(Level3FindObjectInitial()) {
@@ -155,6 +157,9 @@ class Level3FindObjectBloc extends Bloc<Level3FindObjectEvent, Level3FindObjectS
   Future<void> _updateGameScore(int score, int level) async {
     try {
       await _gameScoreService.updateGameScore(level, score);
+      
+      // Check badge achievements after updating game score
+      await _checkBadgeAchievements.call();
     } catch (e) {
       print('Error updating game score: $e');
     }

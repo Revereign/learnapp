@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import '../../../../domain/entities/materi.dart';
 import '../../../../domain/usecases/materi/get_materi_by_level.dart';
+import '../../../../domain/usecases/auth/check_badge_achievements.dart';
 import '../../../../data/services/game_score_service.dart';
 
 // Events
@@ -131,6 +132,7 @@ class CountingQuestion {
 class CountingGameBloc extends Bloc<CountingGameEvent, CountingGameState> {
   final GetMateriByLevel getMateriByLevel;
   final GameScoreService _gameScoreService = GameScoreService();
+  final CheckBadgeAchievements _checkBadgeAchievements = CheckBadgeAchievements();
   
   CountingGameBloc({
     required this.getMateriByLevel,
@@ -261,6 +263,9 @@ class CountingGameBloc extends Bloc<CountingGameEvent, CountingGameState> {
   Future<void> _updateGameScore(int score, int level) async {
     try {
       await _gameScoreService.updateGameScore(level, score);
+      
+      // Check badge achievements after updating game score
+      await _checkBadgeAchievements.call();
     } catch (e) {
       print('Error updating game score: $e');
     }
