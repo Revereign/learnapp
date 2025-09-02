@@ -9,6 +9,7 @@ import '../../presentation/pages/parent/dashboard_page.dart' as parent;
 import '../../presentation/pages/child/jadikan_sempurna_game_page.dart';
 import '../../presentation/pages/child/leaderboard/leaderboard_level_selection_page.dart';
 import '../../presentation/pages/child/leaderboard/leaderboard_page.dart';
+import '../../presentation/pages/child/achievements/achievement_main_page.dart';
 
 class AppRoutes {
   static const String login = '/login';
@@ -20,6 +21,7 @@ class AppRoutes {
   static const String parentDashboard = '/parent-dashboard';
   static const String jadikanSempurna = '/jadikan-sempurna';
   static const String leaderboard = '/leaderboard';
+  static const String achievements = '/achievements';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -44,6 +46,10 @@ class AppRoutes {
       case leaderboard:
         return MaterialPageRoute(
           builder: (_) => const LeaderboardLevelSelectionPage(),
+        );
+      case achievements:
+        return MaterialPageRoute(
+          builder: (_) => const AchievementMainPage(),
         );
       default:
         return MaterialPageRoute(

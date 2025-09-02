@@ -74,6 +74,13 @@ class AuthRepositoryImpl implements AuthRepository {
 
 
   @override
+  Future<void> updateUserEquipBadge(String uid, int equipBadge) async {
+    await FirebaseFirestore.instance.collection('users').doc(uid).update({
+      'equipBadge': equipBadge,
+    });
+  }
+
+  @override
   Future<void> signOut() async {
     await remoteDataSource.signOut();
   }
