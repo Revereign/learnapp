@@ -114,7 +114,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
                         
                         // Menu buttons
                         _buildMenuButton(
-                          'Play',
+                          'Mulai Bermain',
                           Icons.play_arrow,
                           () => _onButtonTap('/choose-level'),
                           Colors.green,
@@ -123,7 +123,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
                         const SizedBox(height: 20),
                         
                         _buildMenuButton(
-                          'Achievements',
+                          'Pencapaian',
                           Icons.emoji_events,
                           () => _onButtonTap('/achievements'),
                           Colors.orange,
@@ -132,7 +132,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
                         const SizedBox(height: 20),
                         
                         _buildMenuButton(
-                          'Leaderboard',
+                          'Papan Peringkat',
                           Icons.leaderboard,
                           () => _onButtonTap('/leaderboard'),
                           Colors.purple,
@@ -150,7 +150,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
                         const SizedBox(height: 20),
                         
                         _buildMenuButton(
-                          'Logout',
+                          'Keluar',
                           Icons.logout,
                           () => _onButtonTap('/logout'),
                           Colors.red,
