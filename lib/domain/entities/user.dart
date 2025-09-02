@@ -11,6 +11,7 @@ class UserEntity {
   final List<bool>? achieve;
   final int? todayTime;
   final int? allTime;
+  final int? equipBadge;
 
   UserEntity({
     required this.uid,
@@ -25,6 +26,7 @@ class UserEntity {
     this.achieve,
     this.todayTime,
     this.allTime,
+    this.equipBadge,
   });
 
   UserEntity copyWith({
@@ -40,6 +42,7 @@ class UserEntity {
     List<bool>? achieve,
     int? todayTime,
     int? allTime,
+    int? equipBadge,
   }) {
     return UserEntity(
       uid: uid ?? this.uid,
@@ -54,6 +57,7 @@ class UserEntity {
       achieve: achieve ?? this.achieve,
       todayTime: todayTime ?? this.todayTime,
       allTime: allTime ?? this.allTime,
+      equipBadge: equipBadge ?? this.equipBadge,
     );
   }
 

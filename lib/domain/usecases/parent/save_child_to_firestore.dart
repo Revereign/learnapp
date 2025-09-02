@@ -21,6 +21,7 @@ class SaveChildToFirestore {
       achieve: List.filled(6, false),
       todayTime: 0,
       allTime: 0,
+      equipBadge: 0,
     );
 
     // Simpan user ke Firestore

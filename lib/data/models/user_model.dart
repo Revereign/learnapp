@@ -14,6 +14,7 @@ class UserModel {
   final List<bool>? achieve;
   final int? todayTime;
   final int? allTime;
+  final int? equipBadge;
 
   UserModel({
     required this.uid,
@@ -28,6 +29,7 @@ class UserModel {
     this.achieve,
     this.todayTime,
     this.allTime,
+    this.equipBadge,
   });
 
   factory UserModel.fromFirebaseUser(String uid, String email) {
@@ -62,6 +64,7 @@ class UserModel {
           : null,
       todayTime: data["todayTime"],
       allTime: data["allTime"],
+      equipBadge: data["equipBadge"],
     );
   }
 
@@ -76,6 +79,7 @@ class UserModel {
     "achieve": achieve,
     "todayTime": todayTime,
     "allTime": allTime,
+    "equipBadge": equipBadge,
   };
 
   UserEntity toEntity() {
@@ -92,6 +96,7 @@ class UserModel {
       achieve: achieve,
       todayTime: todayTime,
       allTime: allTime,
+      equipBadge: equipBadge,
     );
   }
 
@@ -109,6 +114,7 @@ class UserModel {
       achieve: entity.achieve,
       todayTime: entity.todayTime,
       allTime: entity.allTime,
+      equipBadge: entity.equipBadge,
     );
   }
 }

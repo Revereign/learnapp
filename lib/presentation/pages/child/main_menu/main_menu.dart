@@ -139,7 +139,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
                         ),
                         
                         const SizedBox(height: 20),
-                        
+
                         _buildMenuButton(
                           'Keluar',
                           Icons.logout,

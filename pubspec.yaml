@@ -96,6 +96,12 @@ flutter:
      - assets/images/level6_bg.png
      - assets/animations/learning.json
      - assets/animations/plant.json
+     - assets/badges/badge_1.png
+     - assets/badges/badge_2.png
+     - assets/badges/badge_3.png
+     - assets/badges/badge_4.png
+     - assets/badges/badge_5.png
+     - assets/badges/badge_6.png
      - assets/audio/click.mp3
      - assets/audio/menu_bgm.mp3
      - assets/audio/correct_answer.mp3

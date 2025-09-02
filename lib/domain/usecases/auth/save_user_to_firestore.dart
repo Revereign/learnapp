@@ -12,7 +12,17 @@ class SaveUserToFirestore {
 
     // Simpan user ke Firestore
     await repository.saveUserToFirestore(
-      user.copyWith(name: defaultName, role: role),
+      user.copyWith(
+        name: defaultName, 
+        role: role,
+        gameScore: List.filled(10, 0),
+        quizScore: List.filled(10, 0),
+        quizTime: List.filled(10, 0),
+        achieve: List.filled(6, false),
+        todayTime: 0,
+        allTime: 0,
+        equipBadge: 0,
+      ),
     );
   }
 }

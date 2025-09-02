@@ -43,6 +43,7 @@ class AuthRepositoryImpl implements AuthRepository {
           : null,
       todayTime: data['todayTime'],
       allTime: data['allTime'],
+      equipBadge: data['equipBadge'],
     );
   }
 
@@ -67,6 +68,7 @@ class AuthRepositoryImpl implements AuthRepository {
       'achieve': user.achieve ?? List.filled(6, false),
       'todayTime': user.todayTime ?? 0,
       'allTime': user.allTime ?? 0,
+      'equipBadge': user.equipBadge ?? 0,
     });
   }
 

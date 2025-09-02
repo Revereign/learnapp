@@ -28,6 +28,7 @@ class ChildAuthRepositoryImpl implements ChildAuthRepository {
       'achieve': List.filled(6, false), // Default false untuk 6 achievement
       'todayTime': 0, // Default 0
       'allTime': 0, // Default 0
+      'equipBadge': 0, // Default 0
     });
   }
 }
