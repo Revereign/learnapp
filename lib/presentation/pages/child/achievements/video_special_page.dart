@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'video_player_page.dart';
 
 class VideoSpecialPage extends StatefulWidget {
   const VideoSpecialPage({super.key});
@@ -54,14 +55,16 @@ class _VideoSpecialPageState extends State<VideoSpecialPage> {
 
   Future<void> _loadVideoUrls() async {
     try {
-      final videoFiles = ['video_1', 'video_2', 'video_3'];
+      final videoFiles = ['video_1.mp4', 'video_2.mp4', 'video_3.mp4'];
       final urls = <String, String>{};
 
       for (String videoFile in videoFiles) {
         try {
           final ref = _storage.ref().child('video/$videoFile');
           final url = await ref.getDownloadURL();
-          urls[videoFile] = url;
+          // Store with key without extension for easier access
+          final key = videoFile.replaceAll('.mp4', '');
+          urls[key] = url;
         } catch (e) {
           print('Error loading video $videoFile: $e');
         }
@@ -152,13 +155,27 @@ class _VideoSpecialPageState extends State<VideoSpecialPage> {
   }
 
   void _watchVideo(int videoIndex) {
-    // TODO: Implement video watching functionality
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Fitur menonton video akan segera hadir!'),
-        backgroundColor: Colors.orange,
-      ),
-    );
+    final videoKey = 'video_$videoIndex';
+    final videoUrl = videoUrls[videoKey];
+    
+    if (videoUrl != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => VideoPlayerPage(
+            videoUrl: videoUrl,
+            videoTitle: 'Video Spesial $videoIndex',
+          ),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Video tidak tersedia'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override
