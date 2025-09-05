@@ -9,7 +9,12 @@ import '../../blocs/child/level/level_state.dart';
 import 'sub_level_page.dart';
 
 class ChooseLevelPage extends StatefulWidget {
-  const ChooseLevelPage({super.key});
+  final bool isParentUser;
+  
+  const ChooseLevelPage({
+    super.key,
+    this.isParentUser = false,
+  });
 
   @override
   State<ChooseLevelPage> createState() => _ChooseLevelPageState();
@@ -28,6 +33,11 @@ class _ChooseLevelPageState extends State<ChooseLevelPage>
     _loadAssets();
     _setupAnimations();
     _loadLevels();
+    
+    // Start BGM for parent users only
+    if (widget.isParentUser) {
+      _audioManager.startBGM('menu_bgm.mp3');
+    }
   }
 
   void _setupAnimations() {
@@ -80,6 +90,10 @@ class _ChooseLevelPageState extends State<ChooseLevelPage>
 
   @override
   void dispose() {
+    // Stop BGM for parent users when leaving the page
+    if (widget.isParentUser) {
+      _audioManager.stopBGM();
+    }
     _animationController.dispose();
     super.dispose();
   }

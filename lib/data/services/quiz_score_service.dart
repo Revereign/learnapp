@@ -16,6 +16,13 @@ class QuizScoreService {
       if (!userDoc.exists) return false;
 
       final userData = userDoc.data()!;
+      
+      // Check if user role is 'orangtua' - don't save score for parents
+      if (userData['role'] == 'orangtua') {
+        print('Parent user detected - skipping quiz score save');
+        return false;
+      }
+      
       final currentQuizScore = List<int>.from(userData['quizScore'] ?? List.filled(10, 0));
       
       // Check if new score is higher than current score for this level
@@ -48,6 +55,13 @@ class QuizScoreService {
       if (!userDoc.exists) return false;
 
       final userData = userDoc.data()!;
+      
+      // Check if user role is 'orangtua' - don't save time for parents
+      if (userData['role'] == 'orangtua') {
+        print('Parent user detected - skipping quiz time save');
+        return false;
+      }
+      
       final currentQuizTime = List<int>.from(userData['quizTime'] ?? List.filled(10, 0));
       
       // Check if new time is faster (smaller) than current time for this level

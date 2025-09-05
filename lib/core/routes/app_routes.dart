@@ -36,7 +36,7 @@ class AppRoutes {
       case mainMenu:
         return MaterialPageRoute(builder: (_) => const MainMenuPage());
       case chooseLevel:
-        return MaterialPageRoute(builder: (_) => const ChooseLevelPage());
+        return MaterialPageRoute(builder: (_) => const ChooseLevelPage(isParentUser: false));
       case adminDashboard:
         return MaterialPageRoute(builder: (_) => const AdminDashboardPage());
       case addSampleData:

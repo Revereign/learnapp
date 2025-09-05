@@ -16,6 +16,13 @@ class GameScoreService {
       if (!userDoc.exists) return false;
 
       final userData = userDoc.data()!;
+      
+      // Check if user role is 'orangtua' - don't save score for parents
+      if (userData['role'] == 'orangtua') {
+        print('Parent user detected - skipping game score save');
+        return false;
+      }
+      
       final currentGameScore = List<int>.from(userData['gameScore'] ?? List.filled(10, 0));
       
       // Check if new score is higher than current score for this level
