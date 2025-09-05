@@ -6,6 +6,7 @@ import '../../../domain/usecases/auth/sign_up.dart';
 import '../../../domain/usecases/auth/sign_out.dart';
 import '../../../domain/usecases/auth/save_user_to_firestore.dart';
 import '../../../domain/usecases/auth/check_auth_state.dart';
+import '../../../core/services/time_tracking_service.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final SignIn signIn;
@@ -25,6 +26,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(AuthLoading());
       try {
         final user = await signIn(event.email, event.password);
+        
+        // Start time tracking untuk user anak
+        if (user.role == 'anak') {
+          final timeTrackingService = TimeTrackingService();
+          final isChild = await timeTrackingService.isChildUser(user.uid);
+          if (isChild) {
+            timeTrackingService.startTracking(user.uid);
+          }
+        }
+        
         emit(AuthSuccess(user));
       } catch (e) {
         emit(AuthFailure(e.toString()));
@@ -49,6 +60,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     });
 
     on<AuthSignOutEvent>((event, emit) async {
+      // Stop time tracking sebelum logout
+      final timeTrackingService = TimeTrackingService();
+      await timeTrackingService.forceUpdate();
+      timeTrackingService.stopTracking();
+      
       await signOut();
       emit(AuthLoggedOut());
     });
@@ -58,6 +74,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       try {
         final user = await checkAuthState();
         if (user != null) {
+          // Start time tracking untuk user anak yang sudah login
+          if (user.role == 'anak') {
+            final timeTrackingService = TimeTrackingService();
+            final isChild = await timeTrackingService.isChildUser(user.uid);
+            if (isChild) {
+              timeTrackingService.startTracking(user.uid);
+            }
+          }
+          
           emit(AuthSuccess(user));
         } else {
           emit(AuthLoggedOut());

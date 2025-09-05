@@ -29,6 +29,7 @@ import 'package:learnapp/domain/usecases/auth/save_user_to_firestore.dart';
 import 'package:learnapp/domain/usecases/auth/check_auth_state.dart';
 import 'package:learnapp/domain/usecases/parent/child_sign_up.dart';
 import 'package:learnapp/domain/usecases/parent/save_child_to_firestore.dart';
+import 'package:learnapp/core/services/time_tracking_service.dart';
 import 'package:learnapp/presentation/blocs/manage_quiz/manage_quiz_bloc.dart';
 import 'package:learnapp/presentation/blocs/manage_users/manage_users_bloc.dart';
 import 'package:learnapp/presentation/blocs/materi/materi_bloc.dart';
@@ -242,11 +243,60 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        initialRoute: AppRoutes.splash,
-        onGenerateRoute: AppRoutes.generateRoute,
+      child: AppLifecycleWrapper(
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          initialRoute: AppRoutes.splash,
+          onGenerateRoute: AppRoutes.generateRoute,
+        ),
       ),
     );
+  }
+}
+
+class AppLifecycleWrapper extends StatefulWidget {
+  final Widget child;
+
+  const AppLifecycleWrapper({super.key, required this.child});
+
+  @override
+  State<AppLifecycleWrapper> createState() => _AppLifecycleWrapperState();
+}
+
+class _AppLifecycleWrapperState extends State<AppLifecycleWrapper> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    
+    switch (state) {
+      case AppLifecycleState.resumed:
+        TimeTrackingService().onAppResumed();
+        break;
+      case AppLifecycleState.paused:
+        TimeTrackingService().onAppPaused();
+        break;
+      case AppLifecycleState.detached:
+        TimeTrackingService().forceUpdate();
+        break;
+      default:
+        break;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.child;
   }
 }

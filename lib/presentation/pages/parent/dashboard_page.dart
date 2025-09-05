@@ -5,6 +5,7 @@ import 'package:learnapp/presentation/blocs/auth/auth_event.dart';
 import 'package:learnapp/presentation/pages/auth/login_page.dart';
 import 'package:learnapp/presentation/pages/parent/edit_profile_page.dart';
 import 'package:learnapp/presentation/pages/parent/register_child_page.dart';
+import 'package:learnapp/presentation/pages/parent/select_child_page.dart';
 
 class ParentDashboardPage extends StatelessWidget {
   const ParentDashboardPage({super.key});
@@ -74,7 +75,17 @@ class ParentDashboardPage extends StatelessWidget {
                 },
                 Colors.blue.shade400,
               ),
-              _buildMenuCard("Progress Anak", Icons.quiz, () {}, Colors.green.shade400),
+              _buildMenuCard(
+                "Progress Anak",
+                Icons.quiz,
+                () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const SelectChildPage()),
+                  );
+                },
+                Colors.green.shade400,
+              ),
               _buildMenuCard("Materi Pembelajaran", Icons.group, () {}, Colors.orange.shade400),
               _buildMenuCard(
                 "Edit Profile",
