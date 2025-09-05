@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'learning_report_page.dart';
+import 'edit_child_profile_page.dart';
 
-class ChildProgressMenuPage extends StatelessWidget {
+class ChildProgressMenuPage extends StatefulWidget {
   final String childUid;
   final String childName;
 
@@ -10,6 +12,50 @@ class ChildProgressMenuPage extends StatelessWidget {
     required this.childUid,
     required this.childName,
   });
+
+  @override
+  State<ChildProgressMenuPage> createState() => _ChildProgressMenuPageState();
+}
+
+class _ChildProgressMenuPageState extends State<ChildProgressMenuPage> {
+  String _currentChildName = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _currentChildName = widget.childName;
+  }
+
+  Future<bool> _refreshChildData() async {
+    try {
+      // Ambil data terbaru dari Firestore
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(widget.childUid)
+          .get();
+      
+      if (doc.exists) {
+        final data = doc.data()!;
+        final newName = data['name'] ?? widget.childName;
+        if (newName != _currentChildName) {
+          setState(() {
+            _currentChildName = newName;
+          });
+          return true; // Ada perubahan
+        }
+      }
+      return false; // Tidak ada perubahan
+    } catch (e) {
+      print('Error refreshing child data: $e');
+      return false;
+    }
+  }
+
+  @override
+  void dispose() {
+    // Kembalikan true untuk menandakan ada perubahan
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +113,7 @@ class ChildProgressMenuPage extends StatelessWidget {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      childName,
+                      _currentChildName,
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -95,8 +141,8 @@ class ChildProgressMenuPage extends StatelessWidget {
                           context,
                           MaterialPageRoute(
                             builder: (_) => LearningReportPage(
-                              childUid: childUid,
-                              childName: childName,
+                              childUid: widget.childUid,
+                              childName: _currentChildName,
                             ),
                           ),
                         );
@@ -111,14 +157,25 @@ class ChildProgressMenuPage extends StatelessWidget {
                       'Ubah data profil anak',
                       Icons.edit,
                       Colors.orange.shade400,
-                      () {
-                        // TODO: Implement edit profile
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Fitur Edit Profil akan segera hadir'),
-                            backgroundColor: Colors.orange,
+                      () async {
+                        final result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => EditChildProfilePage(
+                              childUid: widget.childUid,
+                              childName: _currentChildName,
+                            ),
                           ),
                         );
+                        
+                        // Refresh data jika ada perubahan
+                        if (result == true) {
+                          final hasChanges = await _refreshChildData();
+                          if (hasChanges) {
+                            // Kembalikan true ke halaman sebelumnya
+                            Navigator.pop(context, true);
+                          }
+                        }
                       },
                     ),
                   ],

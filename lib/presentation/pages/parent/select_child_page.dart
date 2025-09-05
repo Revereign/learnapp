@@ -22,6 +22,13 @@ class _SelectChildPageState extends State<SelectChildPage> {
     _loadChildren();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Refresh data setiap kali halaman ini dibuka
+    _loadChildren();
+  }
+
   Future<void> _loadChildren() async {
     try {
       final currentUser = _auth.currentUser;
@@ -188,8 +195,8 @@ class _SelectChildPageState extends State<SelectChildPage> {
         ],
       ),
       child: ListTile(
-        onTap: () {
-          Navigator.push(
+        onTap: () async {
+          final result = await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (_) => ChildProgressMenuPage(
@@ -198,6 +205,11 @@ class _SelectChildPageState extends State<SelectChildPage> {
               ),
             ),
           );
+          
+          // Refresh data jika ada perubahan
+          if (result == true) {
+            _loadChildren();
+          }
         },
         leading: Container(
           width: 50,
