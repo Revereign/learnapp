@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:learnapp/presentation/blocs/auth/auth_bloc.dart';
 import 'package:learnapp/presentation/blocs/auth/auth_event.dart';
+import 'package:learnapp/presentation/blocs/auth/auth_state.dart';
 import 'package:learnapp/presentation/pages/auth/login_page.dart';
 import 'package:learnapp/presentation/pages/parent/edit_profile_page.dart';
 import 'package:learnapp/presentation/pages/parent/register_child_page.dart';
 import 'package:learnapp/presentation/pages/parent/select_child_page.dart';
 import 'package:learnapp/presentation/pages/child/choose_level.dart';
+import 'package:learnapp/presentation/pages/parent/feedback_page.dart';
 
 class ParentDashboardPage extends StatelessWidget {
   const ParentDashboardPage({super.key});
@@ -97,6 +99,26 @@ class ParentDashboardPage extends StatelessWidget {
                   );
                 }, 
                 Colors.orange.shade400
+              ),
+              BlocBuilder<AuthBloc, AuthState>(
+                builder: (context, state) {
+                  if (state is AuthSuccess) {
+                    return _buildMenuCard(
+                      "Beri Feedback",
+                      Icons.feedback,
+                      () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => FeedbackPage(parentUid: state.user.uid),
+                          ),
+                        );
+                      },
+                      Colors.cyan.shade400,
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
               ),
               _buildMenuCard(
                 "Edit Profile",
