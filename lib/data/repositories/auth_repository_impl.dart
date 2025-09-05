@@ -84,4 +84,49 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> signOut() async {
     await remoteDataSource.signOut();
   }
+
+  @override
+  Future<UserEntity?> getCurrentUser() async {
+    try {
+      final userModel = await remoteDataSource.getCurrentUser();
+      if (userModel == null) return null;
+
+      // Ambil data dari Firestore
+      final doc = await FirebaseFirestore.instance.collection('users').doc(userModel.uid).get();
+
+      if (!doc.exists) {
+        return null;
+      }
+
+      final data = doc.data()!;
+      return UserEntity(
+        uid: userModel.uid,
+        email: userModel.email,
+        name: data['name'] ?? '',
+        role: data['role'] ?? '',
+        parentUid: data['parentUid'],
+        deletedAt: data['deletedAt'] != null
+            ? (data['deletedAt'] as Timestamp).toDate()
+            : null,
+        gameScore: data['gameScore'] != null
+            ? List<int>.from(data['gameScore'])
+            : null,
+        quizScore: data['quizScore'] != null
+            ? List<int>.from(data['quizScore'])
+            : null,
+        quizTime: data['quizTime'] != null
+            ? List<int>.from(data['quizTime'])
+            : null,
+        achieve: data['achieve'] != null
+            ? List<bool>.from(data['achieve'])
+            : null,
+        todayTime: data['todayTime'],
+        allTime: data['allTime'],
+        equipBadge: data['equipBadge'],
+      );
+    } catch (e) {
+      print('Error getting current user: $e');
+      return null;
+    }
+  }
 }

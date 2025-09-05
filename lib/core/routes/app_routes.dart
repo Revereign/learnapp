@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../presentation/pages/splash_page.dart';
 import '../../presentation/pages/auth/login_page.dart';
 import '../../presentation/pages/auth/register_page.dart';
 import '../../presentation/pages/child/main_menu/main_menu.dart';
@@ -12,6 +13,7 @@ import '../../presentation/pages/child/leaderboard/leaderboard_page.dart';
 import '../../presentation/pages/child/achievements/achievement_main_page.dart';
 
 class AppRoutes {
+  static const String splash = '/';
   static const String login = '/login';
   static const String register = '/register';
   static const String mainMenu = '/main-menu';
@@ -25,6 +27,8 @@ class AppRoutes {
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
+      case splash:
+        return MaterialPageRoute(builder: (_) => const SplashPage());
       case login:
         return MaterialPageRoute(builder: (_) => const LoginPage());
       case register:

@@ -17,6 +17,7 @@ class LeaderboardRepositoryImpl implements LeaderboardRepository {
       name: model.name,
       score: model.score,
       time: model.time,
+      equipBadge: model.equipBadge,
     )).toList();
   }
 }

@@ -6,4 +6,5 @@ abstract class AuthRepository {
   Future<void> saveUserToFirestore(UserEntity user);
   Future<void> updateUserEquipBadge(String uid, int equipBadge);
   Future<void> signOut();
+  Future<UserEntity?> getCurrentUser();
 }

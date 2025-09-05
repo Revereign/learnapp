@@ -5,6 +5,7 @@ abstract class AuthRemoteDataSource {
   Future<UserModel> signIn(String email, String password);
   Future<UserModel> signUp(String email, String password);
   Future<void> signOut();
+  Future<UserModel?> getCurrentUser();
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -31,5 +32,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<void> signOut() async {
     await auth.signOut();
+  }
+
+  @override
+  Future<UserModel?> getCurrentUser() async {
+    final user = auth.currentUser;
+    if (user != null) {
+      return UserModel.fromFirebaseUser(user.uid, user.email!);
+    }
+    return null;
   }
 }

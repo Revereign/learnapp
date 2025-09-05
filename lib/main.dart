@@ -26,6 +26,7 @@ import 'package:learnapp/domain/usecases/materi/update_materi.dart';
 import 'package:learnapp/domain/usecases/prompt/get_prompt.dart';
 import 'package:learnapp/domain/usecases/prompt/update_prompt.dart';
 import 'package:learnapp/domain/usecases/auth/save_user_to_firestore.dart';
+import 'package:learnapp/domain/usecases/auth/check_auth_state.dart';
 import 'package:learnapp/domain/usecases/parent/child_sign_up.dart';
 import 'package:learnapp/domain/usecases/parent/save_child_to_firestore.dart';
 import 'package:learnapp/presentation/blocs/manage_quiz/manage_quiz_bloc.dart';
@@ -82,6 +83,7 @@ class MyApp extends StatelessWidget {
               signUp: SignUp(authRepository),
               signOut: SignOut(authRepository),
               saveUserToFirestore: SaveUserToFirestore(authRepository),
+              checkAuthState: CheckAuthState(authRepository),
             );
           },
         ),
@@ -242,7 +244,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        initialRoute: AppRoutes.login,
+        initialRoute: AppRoutes.splash,
         onGenerateRoute: AppRoutes.generateRoute,
       ),
     );

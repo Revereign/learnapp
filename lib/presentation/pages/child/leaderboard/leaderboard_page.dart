@@ -364,12 +364,13 @@ class LeaderboardPage extends StatelessWidget {
             
             const SizedBox(width: 16),
             
-            // User name
+            // User name (reduced width)
             Expanded(
+              flex: 2,
               child: Text(
                 isEmpty ? '-' : entry.name,
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: isEmpty ? Colors.grey.shade400 : Colors.black87,
                 ),
@@ -377,15 +378,29 @@ class LeaderboardPage extends StatelessWidget {
               ),
             ),
             
-            const SizedBox(width: 16),
+            // Badge display
+            if (!isEmpty && entry.equipBadge > 0)
+              Container(
+                width: 30,
+                height: 30,
+                margin: const EdgeInsets.symmetric(horizontal: 8),
+                child: Image.asset(
+                  'assets/badges/badge_${entry.equipBadge}.png',
+                  fit: BoxFit.contain,
+                ),
+              )
+            else if (!isEmpty)
+              const SizedBox(width: 30, height: 30),
             
-            // Score and time
+            const SizedBox(width: 8),
+            
+            // Score and time (reduced spacing)
             if (isEmpty)
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   _buildScoreDisplay('-', true),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 8),
                   _buildScoreDisplay('-', true),
                 ],
               )
@@ -394,7 +409,7 @@ class LeaderboardPage extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   _buildScoreDisplay('${entry.score}', false),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 8),
                   _buildScoreDisplay(_formatTime(entry.time), false),
                 ],
               ),

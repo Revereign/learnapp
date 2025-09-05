@@ -31,6 +31,7 @@ class LeaderboardRemoteDataSourceImpl implements LeaderboardRemoteDataSource {
             name: data['name'] ?? 'Unknown User',
             score: quizScore[level - 1],
             time: quizTime[level - 1],
+            equipBadge: data['equipBadge'] ?? 0,
           ));
         }
       }
@@ -59,6 +60,7 @@ class LeaderboardRemoteDataSourceImpl implements LeaderboardRemoteDataSource {
           name: '-',
           score: 0,
           time: 0,
+          equipBadge: 0,
         ));
       }
 
@@ -70,6 +72,7 @@ class LeaderboardRemoteDataSourceImpl implements LeaderboardRemoteDataSource {
         name: '-',
         score: 0,
         time: 0,
+        equipBadge: 0,
       ));
     }
   }
