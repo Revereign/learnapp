@@ -48,7 +48,6 @@ class EditChildProfileView extends StatefulWidget {
 class _EditChildProfileViewState extends State<EditChildProfileView> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
-  final _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +71,7 @@ class _EditChildProfileViewState extends State<EditChildProfileView> {
         return Scaffold(
           backgroundColor: const Color(0xFFF5F5F5),
           appBar: AppBar(
-            title: Text("Edit Profil Anak"),
+            title: Text("Edit Nama Anak"),
             backgroundColor: Colors.white,
             foregroundColor: Colors.black,
             elevation: 0,
@@ -98,36 +97,6 @@ class _EditChildProfileViewState extends State<EditChildProfileView> {
                         context.read<EditChildProfileBloc>().add(NameChanged(val)),
                     validator: (val) =>
                     val == null || val.isEmpty ? 'Nama wajib diisi' : null,
-                  ),
-                  const SizedBox(height: 16),
-                  
-                  // Field password
-                  TextFormField(
-                    controller: _passwordController,
-                    decoration: const InputDecoration(
-                      labelText: 'Password Baru (Opsional)',
-                      border: OutlineInputBorder(),
-                      filled: true,
-                      fillColor: Colors.white,
-                    ),
-                    obscureText: true,
-                    onChanged: (val) => context
-                        .read<EditChildProfileBloc>()
-                        .add(PasswordChanged(val)),
-                    validator: (val) {
-                      if (val != null && val.isNotEmpty && val.length < 6) {
-                        return 'Password minimal 6 karakter';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Kosongkan jika tidak ingin mengubah password',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[600],
-                    ),
                   ),
                   const SizedBox(height: 30),
                   

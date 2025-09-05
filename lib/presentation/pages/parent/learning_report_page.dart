@@ -84,7 +84,7 @@ class _LearningReportPageState extends State<LearningReportPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Laporan $widget.childName'),
+        title: Text('Laporan Pembelajaran'),
         backgroundColor: Colors.green.shade700,
         foregroundColor: Colors.white,
         elevation: 0,

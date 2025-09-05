@@ -153,8 +153,8 @@ class _ChildProgressMenuPageState extends State<ChildProgressMenuPage> {
                     
                     _buildMenuCard(
                       context,
-                      'Edit Profil',
-                      'Ubah data profil anak',
+                      'Edit Nama Anak',
+                      'Ubah data nama anak',
                       Icons.edit,
                       Colors.orange.shade400,
                       () async {

@@ -17,7 +17,6 @@ class EditChildProfileBloc extends Bloc<EditChildProfileEvent, EditChildProfileS
   }) : super(EditChildProfileState.initial()) {
     on<LoadChildProfile>(_onLoadProfile);
     on<NameChanged>((event, emit) => emit(state.copyWith(name: event.name)));
-    on<PasswordChanged>((event, emit) => emit(state.copyWith(password: event.password)));
     on<SubmitChildProfileChanges>(_onSubmitChanges);
   }
 
@@ -55,18 +54,9 @@ class EditChildProfileBloc extends Bloc<EditChildProfileEvent, EditChildProfileS
         'name': state.name,
       });
 
-      // Update password jika ada perubahan
-      if (state.password.isNotEmpty) {
-        // Untuk update password, kita perlu sign in sebagai anak terlebih dahulu
-        // Tapi karena ini dilakukan oleh parent, kita akan skip password update
-        // atau implementasi khusus untuk parent update password anak
-        // Untuk sekarang, kita skip password update
-      }
-
       emit(state.copyWith(
         isLoading: false,
         success: true,
-        password: '', // reset password field
       ));
       
       // Reload profile setelah update
