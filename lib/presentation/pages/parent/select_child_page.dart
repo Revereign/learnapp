@@ -34,15 +34,21 @@ class _SelectChildPageState extends State<SelectChildPage> {
           .get();
 
       setState(() {
-        _children = snapshot.docs.map((doc) {
-          final data = doc.data();
-          return {
-            'uid': doc.id,
-            'name': data['name'] ?? 'Unknown',
-            'email': data['email'] ?? '',
-            'createdAt': data['createdAt'],
-          };
-        }).toList();
+        _children = snapshot.docs
+            .where((doc) {
+              final data = doc.data();
+              // Filter out deleted accounts (deletedAt is not null)
+              return data['deletedAt'] == null;
+            })
+            .map((doc) {
+              final data = doc.data();
+              return {
+                'uid': doc.id,
+                'name': data['name'] ?? 'Unknown',
+                'email': data['email'] ?? '',
+                'createdAt': data['createdAt'],
+              };
+            }).toList();
         _isLoading = false;
       });
     } catch (e) {
@@ -64,7 +70,7 @@ class _SelectChildPageState extends State<SelectChildPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pilih Akun Anak'),
+        title: const Text('Kelola Akun Anak'),
         backgroundColor: Colors.blue.shade700,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -136,7 +142,7 @@ class _SelectChildPageState extends State<SelectChildPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Pilih akun anak untuk melihat progress:',
+                          'Pilih akun anak untuk dikelola',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,

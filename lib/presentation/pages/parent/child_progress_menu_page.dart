@@ -15,7 +15,7 @@ class ChildProgressMenuPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Progress $childName'),
+        title: Text('Kelola Akun Anak'),
         backgroundColor: Colors.blue.shade700,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -72,14 +72,6 @@ class ChildProgressMenuPage extends StatelessWidget {
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                         color: Colors.blue.shade700,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Pilih menu untuk melihat progress anak',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey.shade600,
                       ),
                     ),
                   ],

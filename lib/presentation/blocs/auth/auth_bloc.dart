@@ -27,6 +27,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       try {
         final user = await signIn(event.email, event.password);
         
+        // Check if account is deleted
+        if (user.deletedAt != null) {
+          emit(AuthFailure("Akun anda telah dinonaktifkan oleh Admin"));
+          return;
+        }
+        
         // Start time tracking untuk user anak
         if (user.role == 'anak') {
           final timeTrackingService = TimeTrackingService();
@@ -74,6 +80,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       try {
         final user = await checkAuthState();
         if (user != null) {
+          // Check if account is deleted
+          if (user.deletedAt != null) {
+            emit(AuthLoggedOut());
+            return;
+          }
+          
           // Start time tracking untuk user anak yang sudah login
           if (user.role == 'anak') {
             final timeTrackingService = TimeTrackingService();

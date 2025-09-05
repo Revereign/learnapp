@@ -28,6 +28,9 @@ class ChildAuthBloc extends Bloc<ChildAuthEvent, ChildAuthState> {
         // Simpan data user ke Firestore
         await saveChildToFirestore(user, defaultRole, parentUid);
 
+        // Logout dari akun anak yang baru dibuat untuk mengembalikan session ke parent
+        await FirebaseAuth.instance.signOut();
+
         emit(ChildAuthSuccess(user));
       } catch (e) {
         emit(ChildAuthFailure(e.toString()));

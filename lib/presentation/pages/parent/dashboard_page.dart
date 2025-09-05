@@ -76,7 +76,7 @@ class ParentDashboardPage extends StatelessWidget {
                 Colors.blue.shade400,
               ),
               _buildMenuCard(
-                "Progress Anak",
+                "Kelola Akun Anak",
                 Icons.quiz,
                 () {
                   Navigator.push(

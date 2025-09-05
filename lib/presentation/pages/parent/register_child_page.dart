@@ -5,6 +5,7 @@ import 'package:learnapp/presentation/blocs/parent/register_child/child_auth_sta
 import 'package:learnapp/presentation/blocs/parent/register_child/child_auth_bloc.dart';
 import 'package:learnapp/presentation/blocs/parent/register_child/child_auth_event.dart';
 import 'package:learnapp/presentation/pages/parent/dashboard_page.dart';
+import 'package:learnapp/presentation/pages/auth/login_page.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../widgets/animated_button.dart';
 
@@ -45,7 +46,7 @@ class _RegisterChildPageState extends State<RegisterChildPage> {
               _hasShownSnackbar = true;
             } else if (state is ChildAuthSuccess) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Registrasi Berhasil!")),
+                const SnackBar(content: Text("Registrasi Berhasil! Silakan login kembali.")),
               );
               _hasShownSnackbar = true;
 
@@ -53,7 +54,7 @@ class _RegisterChildPageState extends State<RegisterChildPage> {
                 if (mounted) {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (_) => const ParentDashboardPage()),
+                    MaterialPageRoute(builder: (_) => const LoginPage()),
                   );
                 }
               });
