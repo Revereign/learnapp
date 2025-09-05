@@ -9,7 +9,7 @@ import '../../blocs/auth/auth_state.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../widgets/animated_button.dart';
 import 'register_page.dart';
-import '../parent/dashboard_page.dart';
+import '../parent/parent_dashboard_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});

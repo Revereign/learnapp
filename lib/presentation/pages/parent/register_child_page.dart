@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:learnapp/presentation/blocs/parent/register_child/child_auth_state.dart';
 import 'package:learnapp/presentation/blocs/parent/register_child/child_auth_bloc.dart';
 import 'package:learnapp/presentation/blocs/parent/register_child/child_auth_event.dart';
-import 'package:learnapp/presentation/pages/parent/dashboard_page.dart';
+import 'package:learnapp/presentation/pages/parent/parent_dashboard_page.dart';
 import 'package:learnapp/presentation/pages/auth/login_page.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../widgets/animated_button.dart';

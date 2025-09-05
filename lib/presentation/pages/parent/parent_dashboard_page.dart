@@ -131,7 +131,7 @@ class ParentDashboardPage extends StatelessWidget {
                 },
                 Colors.purple.shade400,
               ),
-              _buildMenuCard("Logout", Icons.logout, () => _logout(context), Colors.red.shade400),
+              _buildMenuCard("Keluar", Icons.logout, () => _logout(context), Colors.red.shade400),
             ],
           ),
         ),

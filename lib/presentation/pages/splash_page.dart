@@ -5,7 +5,7 @@ import 'package:learnapp/presentation/blocs/auth/auth_event.dart';
 import 'package:learnapp/presentation/blocs/auth/auth_state.dart';
 import 'package:learnapp/presentation/pages/auth/login_page.dart';
 import 'package:learnapp/presentation/pages/child/main_menu/main_menu.dart';
-import 'package:learnapp/presentation/pages/parent/dashboard_page.dart';
+import 'package:learnapp/presentation/pages/parent/parent_dashboard_page.dart';
 import 'package:learnapp/presentation/pages/admin/admin_dashboard_page.dart';
 
 class SplashPage extends StatefulWidget {

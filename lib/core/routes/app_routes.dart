@@ -6,7 +6,7 @@ import '../../presentation/pages/child/main_menu/main_menu.dart';
 import '../../presentation/pages/child/choose_level.dart';
 import '../../presentation/pages/admin/admin_dashboard_page.dart';
 import '../../presentation/pages/admin/add_sample_data_page.dart';
-import '../../presentation/pages/parent/dashboard_page.dart' as parent;
+import '../../presentation/pages/parent/parent_dashboard_page.dart' as parent;
 import '../../presentation/pages/child/jadikan_sempurna_game_page.dart';
 import '../../presentation/pages/child/leaderboard/leaderboard_level_selection_page.dart';
 import '../../presentation/pages/child/leaderboard/leaderboard_page.dart';

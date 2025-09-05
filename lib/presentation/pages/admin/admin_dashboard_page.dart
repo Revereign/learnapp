@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:learnapp/presentation/pages/admin/kelola_akun_page.dart';
 import 'package:learnapp/presentation/pages/admin/kelola_soal_kuis_page.dart';
 import 'package:learnapp/presentation/pages/admin/kelola_prompt_page.dart';
+import 'package:learnapp/presentation/pages/admin/feedback_list_page.dart';
 import '../../blocs/auth/auth_bloc.dart';
 import '../../blocs/auth/auth_event.dart';
 import '../auth/login_page.dart';
@@ -58,12 +59,7 @@ class AdminDashboardPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text("Dashboard Admin"),
         backgroundColor: Colors.blue.shade700,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () => _logout(context),
-          )
-        ],
+        centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -113,7 +109,18 @@ class AdminDashboardPage extends StatelessWidget {
               },
               Colors.purple.shade400,
             ),
-            _buildMenuCard("Logout", Icons.logout, () => _logout(context), Colors.red.shade400),
+            _buildMenuCard(
+              "Lihat Feedback",
+              Icons.feedback,
+              () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const FeedbackListPage()),
+                );
+              },
+              Colors.cyan.shade400,
+            ),
+            _buildMenuCard("Keluar", Icons.logout, () => _logout(context), Colors.red.shade400),
           ],
         ),
       ),
