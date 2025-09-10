@@ -244,6 +244,7 @@ class _LearningReportPageState extends State<LearningReportPage> {
   }
 
   Widget _buildGameScoresCard() {
+    final List<int> gameMaxScores = [12, 10, 7, 7, 12, 7, 10, 7, 12, 10];
     final gameScores = List<int>.from(_childData!['gameScore'] ?? []);
     return _buildCard(
       'Skor Game (${gameScores.length} Level)',
@@ -251,7 +252,7 @@ class _LearningReportPageState extends State<LearningReportPage> {
       Colors.orange,
       [
         for (int i = 0; i < gameScores.length; i++)
-          _buildScoreRow('Level ${i + 1}', '${gameScores[i]}'),
+          _buildScoreRow('Level ${i + 1}', '${gameScores[i]}/${gameMaxScores[i]}'),
       ],
     );
   }

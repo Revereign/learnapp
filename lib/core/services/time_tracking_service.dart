@@ -111,7 +111,7 @@ class TimeTrackingService {
 
       // Reset todayTime jika ganti hari
       if (isNewDay) {
-        newTodayTime = sessionDuration;
+        newTodayTime = 0;
         debugPrint('New day detected - resetting todayTime');
       } else {
         newTodayTime = currentTodayTime + sessionDuration;
