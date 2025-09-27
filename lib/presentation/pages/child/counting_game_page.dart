@@ -532,7 +532,7 @@ class _CountingGamePageState extends State<CountingGamePage>
               builder: (context, child) {
                 return Transform.scale(
                   scale: _fadeAnimation.value,
-                  child: _buildAvailableFruits(state.availableFruits, currentQuestion),
+                  child: _buildAvailableAnswers(state.availableFruits, currentQuestion),
                 );
               },
             ),
@@ -785,7 +785,7 @@ class _CountingGamePageState extends State<CountingGamePage>
 
     Widget _buildDropZone(CountingQuestion question) {
     return DragTarget<String>(
-      onWillAccept: (data) {
+      onWillAcceptWithDetails: (data) {
         // Only accept if we have less than 10 fruits
         return data != null && _droppedAnswer.length < 10;
       },
@@ -931,9 +931,9 @@ class _CountingGamePageState extends State<CountingGamePage>
     );
   }
 
-    Widget _buildAvailableFruits(List<Materi> availableMateri, CountingQuestion question) {
+    Widget _buildAvailableAnswers(List<Materi> availableMateri, CountingQuestion question) {
     // Filter fruits that are in the question options
-    final questionFruits = availableMateri
+    final questionAnswers = availableMateri
         .where((m) => question.options.contains(m.arti))
         .toList();
     
@@ -980,12 +980,12 @@ class _CountingGamePageState extends State<CountingGamePage>
           Wrap(
             spacing: 16,
             runSpacing: 16,
-            children: questionFruits.map((materi) {
+            children: questionAnswers.map((materi) {
               return Draggable<String>(
                 data: materi.arti,
                 feedback: _buildDraggingFeedback(materi),
-                childWhenDragging: _buildDraggableFruit(materi, false),
-                child: _buildDraggableFruit(materi, false),
+                childWhenDragging: _buildDraggableAnswer(materi, false),
+                child: _buildDraggableAnswer(materi, false),
               );
             }).toList(),
           ),
@@ -994,7 +994,7 @@ class _CountingGamePageState extends State<CountingGamePage>
     );
   }
 
-  Widget _buildDraggableFruit(Materi materi, bool isDragging) {
+  Widget _buildDraggableAnswer(Materi materi, bool isDragging) {
     return Container(
       width: 80,
       height: 80,
