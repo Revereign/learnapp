@@ -785,9 +785,9 @@ class _CountingGamePageState extends State<CountingGamePage>
 
     Widget _buildDropZone(CountingQuestion question) {
     return DragTarget<String>(
-      onWillAcceptWithDetails: (data) {
+      onWillAccept: (data) {
         // Only accept if we have less than 10 fruits
-        return _droppedAnswer.length < 10;
+        return data != null && _droppedAnswer.length < 10;
       },
       onAccept: (data) => _onAnswerDropped(data),
       builder: (context, candidateData, rejectedData) {
