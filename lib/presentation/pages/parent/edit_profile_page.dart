@@ -37,14 +37,6 @@ class _EditProfileViewState extends State<EditProfileView> {
   final _nameController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  Future<void> _pickImage(BuildContext context) async {
-    final picker = ImagePicker();
-    final picked = await picker.pickImage(source: ImageSource.gallery);
-    if (picked != null) {
-      context.read<EditProfileBloc>().add(ProfileImagePicked(File(picked.path)));
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<EditProfileBloc, EditProfileState>(
@@ -78,19 +70,6 @@ class _EditProfileViewState extends State<EditProfileView> {
               key: _formKey,
               child: Column(
                 children: [
-                  GestureDetector(
-                    onTap: () => _pickImage(context),
-                    child: CircleAvatar(
-                      radius: 50,
-                      backgroundImage: state.image != null
-                          ? FileImage(state.image!)
-                          : (state.photoUrl != null
-                          ? NetworkImage(state.photoUrl!)
-                          : const AssetImage('assets/images/default_avatar.jpg') as ImageProvider),
-                      backgroundColor: Colors.grey[300],
-                    ),
-                  ),
-                  const SizedBox(height: 20),
                   TextFormField(
                     controller: _nameController,
                     decoration: const InputDecoration(

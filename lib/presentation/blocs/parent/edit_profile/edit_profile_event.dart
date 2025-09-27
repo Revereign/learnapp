@@ -14,9 +14,4 @@ class PasswordChanged extends EditProfileEvent {
   PasswordChanged(this.password);
 }
 
-class ProfileImagePicked extends EditProfileEvent {
-  final File image;
-  ProfileImagePicked(this.image);
-}
-
 class SubmitProfileChanges extends EditProfileEvent {}

@@ -57,7 +57,7 @@ class _KelolaAkunPageState extends State<KelolaAkunPage> {
       context: context,
       builder: (_) => AlertDialog(
         title: const Text("Hapus Akun"),
-        content: Text("Apakah Anda yakin ingin menghapus akun ${user.email}?"),
+        content: Text("Apakah Anda yakin ingin menonaktifkan akun ${user.email}?"),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -102,7 +102,7 @@ class _KelolaAkunPageState extends State<KelolaAkunPage> {
                 return Card(
                   child: ListTile(
                     leading: const Icon(Icons.person),
-                    title: Text(user.email),
+                    title: Text(user.uid),
                     subtitle: Text(user.name?.isNotEmpty == true ? user.name! : "-"),
                     trailing: PopupMenuButton<String>(
                       onSelected: (value) {
@@ -119,7 +119,7 @@ class _KelolaAkunPageState extends State<KelolaAkunPage> {
                         ),
                         const PopupMenuItem(
                           value: "delete",
-                          child: Text("Hapus Akun"),
+                          child: Text("Nonaktifkan"),
                         ),
                       ],
                     ),

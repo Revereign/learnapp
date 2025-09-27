@@ -22,3 +22,5 @@ class SubmitFeedback extends FeedbackEvent {
   @override
   List<Object?> get props => [parentUid];
 }
+
+

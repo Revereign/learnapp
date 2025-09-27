@@ -55,3 +55,5 @@ class FeedbackListState extends Equatable {
   @override
   List<Object?> get props => [feedbacks, isLoading, errorMessage, isDeleting];
 }
+
+

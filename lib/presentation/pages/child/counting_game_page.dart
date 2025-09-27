@@ -5,7 +5,6 @@ import 'package:lottie/lottie.dart';
 import 'package:learnapp/core/services/audio_manager.dart';
 import 'package:learnapp/presentation/blocs/child/level/counting_game_bloc.dart';
 import 'package:learnapp/domain/entities/materi.dart';
-import 'sub_level_page.dart';
 
 class CountingGamePage extends StatefulWidget {
   final int level;
@@ -29,8 +28,7 @@ class _CountingGamePageState extends State<CountingGamePage>
   late Animation<double> _starAnimation;
   
   final AudioManager _audioManager = AudioManager();
-  final List<String> _droppedFruits = [];
-  final List<String> _availableFruits = [];
+  final List<String> _droppedAnswer = [];
   
   @override
   void initState() {
@@ -83,12 +81,12 @@ class _CountingGamePageState extends State<CountingGamePage>
     context.read<CountingGameBloc>().add(LoadCountingGameEvent(widget.level));
   }
 
-  void _onFruitDropped(String fruitName) {
-    print('Fruit dropped: $fruitName');
-    print('Before adding: $_droppedFruits');
+  void _onAnswerDropped(String AnswerName) {
+    print('Answer dropped: $AnswerName');
+    print('Before adding: $_droppedAnswer');
     
     // Check if we can add more fruits (max 10)
-    if (_droppedFruits.length >= 10) {
+    if (_droppedAnswer.length >= 10) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -106,18 +104,18 @@ class _CountingGamePageState extends State<CountingGamePage>
     }
     
     setState(() {
-      _droppedFruits.add(fruitName);
+      _droppedAnswer.add(AnswerName);
     });
-    print('After adding: $_droppedFruits');
+    print('After adding: $_droppedAnswer');
   }
 
-  void _onFruitRemoved(int index) {
-    print('Removing fruit at index: $index');
-    print('Before removal: $_droppedFruits');
+  void _onAnswerRemoved(int index) {
+    print('Removing answer at index: $index');
+    print('Before removal: $_droppedAnswer');
     setState(() {
-      _droppedFruits.removeAt(index);
+      _droppedAnswer.removeAt(index);
     });
-    print('After removal: $_droppedFruits');
+    print('After removal: $_droppedAnswer');
   }
 
   // Helper method untuk ekstrak operasi matematika dari soal
@@ -167,11 +165,10 @@ class _CountingGamePageState extends State<CountingGamePage>
   }
 
   void _onCalculatePressed() {
-    if (_droppedFruits.isEmpty) {
-      // Show snackbar if no fruits are dropped
+    if (_droppedAnswer.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Taruh buah dulu sebelum menghitung!'),
+          content: Text('Taruh jawaban dulu sebelum menghitung!'),
           backgroundColor: Colors.orange,
           duration: Duration(seconds: 2),
         ),
@@ -192,12 +189,12 @@ class _CountingGamePageState extends State<CountingGamePage>
     // Submit answer
     context.read<CountingGameBloc>().add(AnswerQuestionEvent(
       questionIndex: question.questionIndex,
-      selectedFruits: List.from(_droppedFruits),
+      selectedFruits: List.from(_droppedAnswer),
     ));
     
     // Check if answer is correct
-    final isCorrect = _droppedFruits.length == question.correctCount &&
-        _droppedFruits.every((fruit) => fruit == question.correctFruit);
+    final isCorrect = _droppedAnswer.length == question.correctCount &&
+        _droppedAnswer.every((fruit) => fruit == question.correctFruit);
     
     // Play sound effect
     if (isCorrect) {
@@ -243,7 +240,7 @@ class _CountingGamePageState extends State<CountingGamePage>
   void _onNextQuestion() {
     context.read<CountingGameBloc>().add(NextQuestionEvent());
     setState(() {
-      _droppedFruits.clear();
+      _droppedAnswer.clear();
     });
   }
 
@@ -790,9 +787,9 @@ class _CountingGamePageState extends State<CountingGamePage>
     return DragTarget<String>(
       onWillAccept: (data) {
         // Only accept if we have less than 10 fruits
-        return data != null && _droppedFruits.length < 10;
+        return data != null && _droppedAnswer.length < 10;
       },
-      onAccept: (data) => _onFruitDropped(data),
+      onAccept: (data) => _onAnswerDropped(data),
       builder: (context, candidateData, rejectedData) {
         return Container(
           width: double.infinity,
@@ -829,7 +826,7 @@ class _CountingGamePageState extends State<CountingGamePage>
               ),
             ],
           ),
-          child: _droppedFruits.isEmpty
+          child: _droppedAnswer.isEmpty
               ? Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -862,7 +859,7 @@ class _CountingGamePageState extends State<CountingGamePage>
                   ],
                 )
               : Stack(
-                  children: _droppedFruits.asMap().entries.map((entry) {
+                  children: _droppedAnswer.asMap().entries.map((entry) {
                     final index = entry.key;
                     final fruit = entry.value;
                     
@@ -906,7 +903,7 @@ class _CountingGamePageState extends State<CountingGamePage>
     return GestureDetector(
       onTap: () {
         print('Tapped fruit: $fruitName at index: $index');
-        _onFruitRemoved(index);
+        _onAnswerRemoved(index);
       },
       child: Container(
         width: 60,

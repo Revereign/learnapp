@@ -24,8 +24,7 @@ class FeedbackListBloc extends Bloc<FeedbackListEvent, FeedbackListState> {
           .get();
 
       final feedbacks = snapshot.docs
-          .map((doc) => FeedbackItem.fromMap(doc.id, doc.data()))
-          .toList();
+          .map((doc) => FeedbackItem.fromMap(doc.id, doc.data())).toList();
 
       emit(state.copyWith(
         feedbacks: feedbacks,
@@ -62,3 +61,5 @@ class FeedbackListBloc extends Bloc<FeedbackListEvent, FeedbackListState> {
     }
   }
 }
+
+

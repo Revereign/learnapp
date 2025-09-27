@@ -20,7 +20,6 @@ class EditProfileBloc extends Bloc<EditProfileEvent, EditProfileState> {
     on<LoadUserProfile>(_onLoadProfile);
     on<NameChanged>((event, emit) => emit(state.copyWith(name: event.name)));
     on<PasswordChanged>((event, emit) => emit(state.copyWith(password: event.password)));
-    on<ProfileImagePicked>((event, emit) => emit(state.copyWith(image: event.image)));
     on<SubmitProfileChanges>(_onSubmitChanges);
   }
 
@@ -33,7 +32,6 @@ class EditProfileBloc extends Bloc<EditProfileEvent, EditProfileState> {
     final data = userDoc.data();
     emit(state.copyWith(
       name: data?['name'] ?? '',
-      photoUrl: data?['photoUrl'], // Tambahkan ini di state
     ));
   }
 
@@ -44,18 +42,8 @@ class EditProfileBloc extends Bloc<EditProfileEvent, EditProfileState> {
     emit(state.copyWith(isLoading: true));
 
     try {
-      String? photoUrl;
-
-      if (state.image != null) {
-        final ref = storage.ref().child('profile_pictures/${user.uid}.jpg');
-        await ref.putFile(state.image!);
-
-        photoUrl = await ref.getDownloadURL();
-      }
-
       await firestore.collection('users').doc(user.uid).update({
         'name': state.name,
-        if (photoUrl != null) 'photoUrl': photoUrl,
       });
 
       if (state.password.isNotEmpty) {
@@ -66,7 +54,6 @@ class EditProfileBloc extends Bloc<EditProfileEvent, EditProfileState> {
         isLoading: false,
         success: true,
         password: '',   // reset password field
-        image: null,    // reset image picker
       ));
       add(LoadUserProfile());
     } catch (e) {
