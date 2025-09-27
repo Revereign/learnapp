@@ -787,7 +787,7 @@ class _CountingGamePageState extends State<CountingGamePage>
     return DragTarget<String>(
       onWillAcceptWithDetails: (data) {
         // Only accept if we have less than 10 fruits
-        return data != null && _droppedAnswer.length < 10;
+        return _droppedAnswer.length < 10;
       },
       onAccept: (data) => _onAnswerDropped(data),
       builder: (context, candidateData, rejectedData) {
