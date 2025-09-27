@@ -82,10 +82,6 @@ class _CountingGamePageState extends State<CountingGamePage>
   }
 
   void _onAnswerDropped(String AnswerName) {
-    print('Answer dropped: $AnswerName');
-    print('Before adding: $_droppedAnswer');
-    
-    // Check if we can add more fruits (max 10)
     if (_droppedAnswer.length >= 10) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -185,16 +181,16 @@ class _CountingGamePageState extends State<CountingGamePage>
     }
   }
   
-       void _submitAnswer(CountingQuestion question) {
+  void _submitAnswer(CountingQuestion question) {
     // Submit answer
     context.read<CountingGameBloc>().add(AnswerQuestionEvent(
       questionIndex: question.questionIndex,
-      selectedFruits: List.from(_droppedAnswer),
+      selectedAnswers: List.from(_droppedAnswer),
     ));
     
     // Check if answer is correct
     final isCorrect = _droppedAnswer.length == question.correctCount &&
-        _droppedAnswer.every((fruit) => fruit == question.correctFruit);
+        _droppedAnswer.every((answer) => answer == question.correctAnswer);
     
     // Play sound effect
     if (isCorrect) {
@@ -717,7 +713,7 @@ class _CountingGamePageState extends State<CountingGamePage>
 
     Widget _buildAnswerFeedback(CountingQuestion question) {
     final isCorrect = question.isCorrect;
-    final correctAnswer = '${question.correctCount} ${question.correctFruit}';
+    final correctAnswer = '${question.correctCount} ${question.correctAnswer}';
     
     return Container(
       width: double.infinity,
@@ -1477,7 +1473,7 @@ class PopupFeedback extends StatelessWidget {
             Text(
               isCorrect 
                   ? 'Jawaban kamu tepat!'
-                  : 'Jawaban yang benar: ${question.correctCount} ${question.correctFruit}',
+                  : 'Jawaban yang benar: ${question.correctCount} ${question.correctAnswer}',
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 16,

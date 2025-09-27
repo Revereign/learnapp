@@ -1,28 +1,28 @@
 part of 'find_object_bloc.dart';
 
-abstract class Level3FindObjectState extends Equatable {
-  const Level3FindObjectState();
+abstract class FindObjectState extends Equatable {
+  const FindObjectState();
 
   @override
   List<Object?> get props => [];
 }
 
-class Level3FindObjectInitial extends Level3FindObjectState {}
+class Level3FindObjectInitial extends FindObjectState {}
 
-class Level3GameLoading extends Level3FindObjectState {}
+class Level3GameLoading extends FindObjectState {}
 
-class Level3GameLoaded extends Level3FindObjectState {
+class GameLoaded extends FindObjectState {
   final List<Materi> allMateri;
-  final List<Level3GameObject> gameObjects;
+  final List<GameObject> gameObjects;
   final Level3Question? currentQuestion;
-  final Level3Answer? lastAnswer;
+  final LevelAnswer? lastAnswer;
   final int score;
   final int totalQuestions;
   final int lives;
   final List<String> answeredQuestions;
   final int level;
 
-  const Level3GameLoaded({
+  const GameLoaded({
     required this.allMateri,
     required this.gameObjects,
     this.currentQuestion,
@@ -34,18 +34,18 @@ class Level3GameLoaded extends Level3FindObjectState {
     required this.level,
   });
 
-  Level3GameLoaded copyWith({
+  GameLoaded copyWith({
     List<Materi>? allMateri,
-    List<Level3GameObject>? gameObjects,
+    List<GameObject>? gameObjects,
     Level3Question? currentQuestion,
-    Level3Answer? lastAnswer,
+    LevelAnswer? lastAnswer,
     int? score,
     int? totalQuestions,
     int? lives,
     List<String>? answeredQuestions,
     int? level,
   }) {
-    return Level3GameLoaded(
+    return GameLoaded(
       allMateri: allMateri ?? this.allMateri,
       gameObjects: gameObjects ?? this.gameObjects,
       currentQuestion: currentQuestion ?? this.currentQuestion,
@@ -72,7 +72,7 @@ class Level3GameLoaded extends Level3FindObjectState {
   ];
 }
 
-class Level3GameCompleted extends Level3FindObjectState {
+class Level3GameCompleted extends FindObjectState {
   final int score;
   final int totalQuestions;
   final int lives;
@@ -87,11 +87,11 @@ class Level3GameCompleted extends Level3FindObjectState {
   List<Object> get props => [score, totalQuestions, lives];
 }
 
-class Level3GameOver extends Level3FindObjectState {
+class GameOver extends FindObjectState {
   final int score;
   final int totalQuestions;
 
-  const Level3GameOver({
+  const GameOver({
     required this.score,
     required this.totalQuestions,
   });
@@ -100,7 +100,7 @@ class Level3GameOver extends Level3FindObjectState {
   List<Object> get props => [score, totalQuestions];
 }
 
-class Level3GameError extends Level3FindObjectState {
+class Level3GameError extends FindObjectState {
   final String message;
 
   const Level3GameError(this.message);
@@ -119,23 +119,23 @@ class Level3Question {
   });
 }
 
-class Level3Answer {
+class LevelAnswer {
   final bool isCorrect;
   final Materi selectedMateri;
   final Materi correctMateri;
 
-  const Level3Answer({
+  const LevelAnswer({
     required this.isCorrect,
     required this.selectedMateri,
     required this.correctMateri,
   });
 }
 
-class Level3GameObject {
+class GameObject {
   final Materi materi;
   final Offset position;
 
-  const Level3GameObject({
+  const GameObject({
     required this.materi,
     required this.position,
   });

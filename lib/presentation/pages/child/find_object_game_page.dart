@@ -444,7 +444,7 @@ class _Level3FindObjectGamePageState extends State<Level3FindObjectGamePage>
     );
   }
 
-  Widget _buildGameArea(Level3GameLoaded state) {
+  Widget _buildGameArea(GameLoaded state) {
     return Container(
       width: double.infinity,
       height: MediaQuery.of(context).size.height * 0.5,
@@ -481,7 +481,7 @@ class _Level3FindObjectGamePageState extends State<Level3FindObjectGamePage>
                       _bounceController.reverse();
                     });
                     context.read<Level3FindObjectBloc>().add(
-                      CheckLevel3Answer(gameObject.materi),
+                      CheckAnswer(gameObject.materi),
                     );
                   },
                   child: AnimatedBuilder(
@@ -657,7 +657,7 @@ class _Level3FindObjectGamePageState extends State<Level3FindObjectGamePage>
     );
   }
 
-  Widget _buildGameOverScreen(Level3GameOver state) {
+  Widget _buildGameOverScreen(GameOver state) {
     return Center(
       child: Container(
         padding: const EdgeInsets.all(30),
@@ -758,12 +758,12 @@ class _Level3FindObjectGamePageState extends State<Level3FindObjectGamePage>
           ),
         ),
         child: SafeArea(
-          child: BlocConsumer<Level3FindObjectBloc, Level3FindObjectState>(
+          child: BlocConsumer<Level3FindObjectBloc, FindObjectState>(
                          listener: (context, state) {
                // Images are loaded directly from materi data
                // No need for separate loading logic
               
-              if (state is Level3GameLoaded && state.lastAnswer != null) {
+              if (state is GameLoaded && state.lastAnswer != null) {
                 if (state.lastAnswer!.isCorrect) {
                   _playCorrectSound();
                 } else {
@@ -821,11 +821,11 @@ class _Level3FindObjectGamePageState extends State<Level3FindObjectGamePage>
                 return _buildCompletedScreen(state);
               }
 
-              if (state is Level3GameOver) {
+              if (state is GameOver) {
                 return _buildGameOverScreen(state);
               }
 
-              if (state is Level3GameLoaded) {
+              if (state is GameLoaded) {
                 return SingleChildScrollView(
                   child: Padding(
                     padding: const EdgeInsets.all(20),

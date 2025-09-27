@@ -26,15 +26,15 @@ class LoadCountingGameEvent extends CountingGameEvent {
 
 class AnswerQuestionEvent extends CountingGameEvent {
   final int questionIndex;
-  final List<String> selectedFruits;
+  final List<String> selectedAnswers;
   
   const AnswerQuestionEvent({
     required this.questionIndex,
-    required this.selectedFruits,
+    required this.selectedAnswers,
   });
   
   @override
-  List<Object?> get props => [questionIndex, selectedFruits];
+  List<Object?> get props => [questionIndex, selectedAnswers];
 }
 
 class NextQuestionEvent extends CountingGameEvent {}
@@ -91,7 +91,7 @@ class CountingGameError extends CountingGameState {
 class CountingQuestion {
   final int questionIndex;
   final String questionText;
-  final String correctFruit;
+  final String correctAnswer;
   final int correctCount;
   final List<String> options;
   final bool isAnswered;
@@ -100,7 +100,7 @@ class CountingQuestion {
   CountingQuestion({
     required this.questionIndex,
     required this.questionText,
-    required this.correctFruit,
+    required this.correctAnswer,
     required this.correctCount,
     required this.options,
     this.isAnswered = false,
@@ -119,7 +119,7 @@ class CountingQuestion {
     return CountingQuestion(
       questionIndex: questionIndex ?? this.questionIndex,
       questionText: questionText ?? this.questionText,
-      correctFruit: correctFruit ?? this.correctFruit,
+      correctAnswer: correctFruit ?? this.correctAnswer,
       correctCount: correctCount ?? this.correctCount,
       options: options ?? this.options,
       isAnswered: isAnswered ?? this.isAnswered,
@@ -172,7 +172,7 @@ class CountingGameBloc extends Bloc<CountingGameEvent, CountingGameState> {
         print('First question: "${questions.first.questionText}"');
         print('First question length: ${questions.first.questionText.length}');
         print('First question isEmpty: ${questions.first.questionText.isEmpty}');
-        print('First question correctFruit: "${questions.first.correctFruit}"');
+        print('First question correctFruit: "${questions.first.correctAnswer}"');
         print('First question correctCount: ${questions.first.correctCount}');
       } else {
         print('No questions generated!');
@@ -202,7 +202,7 @@ class CountingGameBloc extends Bloc<CountingGameEvent, CountingGameState> {
       // Check if answer is correct
       final isCorrect = _checkAnswer(
         currentQuestion,
-        event.selectedFruits,
+        event.selectedAnswers,
       );
       
       // Update question state
@@ -316,7 +316,7 @@ class CountingGameBloc extends Bloc<CountingGameEvent, CountingGameState> {
       questions.add(CountingQuestion(
         questionIndex: i,
         questionText: questionText,
-        correctFruit: correctFruit,
+        correctAnswer: correctFruit,
         correctCount: correctCount,
         options: options,
       ));
@@ -327,7 +327,7 @@ class CountingGameBloc extends Bloc<CountingGameEvent, CountingGameState> {
   
   bool _checkAnswer(CountingQuestion question, List<String> selectedFruits) {
     // Check if correct fruit is selected
-    if (!selectedFruits.contains(question.correctFruit)) {
+    if (!selectedFruits.contains(question.correctAnswer)) {
       return false;
     }
     
@@ -338,7 +338,7 @@ class CountingGameBloc extends Bloc<CountingGameEvent, CountingGameState> {
     
     // Check if all selected fruits are correct (no wrong fruits)
     for (final fruit in selectedFruits) {
-      if (fruit != question.correctFruit) {
+      if (fruit != question.correctAnswer) {
         return false;
       }
     }

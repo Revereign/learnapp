@@ -10,7 +10,7 @@ import 'dart:math';
 part 'find_object_event.dart';
 part 'find_object_state.dart';
 
-class Level3FindObjectBloc extends Bloc<Level3FindObjectEvent, Level3FindObjectState> {
+class Level3FindObjectBloc extends Bloc<Level3FindObjectEvent, FindObjectState> {
   final GetMateriByLevel getMateriByLevel;
   final GameScoreService _gameScoreService = GameScoreService();
   final CheckBadgeAchievements _checkBadgeAchievements = CheckBadgeAchievements();
@@ -18,11 +18,11 @@ class Level3FindObjectBloc extends Bloc<Level3FindObjectEvent, Level3FindObjectS
 
   Level3FindObjectBloc({required this.getMateriByLevel}) : super(Level3FindObjectInitial()) {
     on<LoadLevel3Game>(_onLoadLevel3Game);
-    on<StartLevel3NewRound>(_onStartLevel3NewRound);
-    on<CheckLevel3Answer>(_onCheckLevel3Answer);
+    on<StartNewRound>(_onStartLevel3NewRound);
+    on<CheckAnswer>(_onCheckAnswer);
   }
 
-  Future<void> _onLoadLevel3Game(LoadLevel3Game event, Emitter<Level3FindObjectState> emit) async {
+  Future<void> _onLoadLevel3Game(LoadLevel3Game event, Emitter<FindObjectState> emit) async {
     emit(Level3GameLoading());
     
     try {
@@ -48,7 +48,7 @@ class Level3FindObjectBloc extends Bloc<Level3FindObjectEvent, Level3FindObjectS
       // Create game objects with well-distributed positions
       final gameObjects = _generateWellDistributedPositions(allGameMateri);
       
-      emit(Level3GameLoaded(
+      emit(GameLoaded(
         allMateri: questionMateri,
         gameObjects: gameObjects,
         currentQuestion: null,
@@ -61,15 +61,15 @@ class Level3FindObjectBloc extends Bloc<Level3FindObjectEvent, Level3FindObjectS
       ));
       
       // Start first round
-      add(StartLevel3NewRound());
+      add(StartNewRound());
     } catch (e) {
       emit(Level3GameError(e.toString()));
     }
   }
 
-  void _onStartLevel3NewRound(StartLevel3NewRound event, Emitter<Level3FindObjectState> emit) {
+  void _onStartLevel3NewRound(StartNewRound event, Emitter<FindObjectState> emit) {
     final currentState = state;
-    if (currentState is Level3GameLoaded) {
+    if (currentState is GameLoaded) {
       if (currentState.answeredQuestions.length >= currentState.totalQuestions) {
         // Update game score before emitting completion state
         _updateGameScore(currentState.score, currentState.level);
@@ -102,9 +102,9 @@ class Level3FindObjectBloc extends Bloc<Level3FindObjectEvent, Level3FindObjectS
     }
   }
 
-  void _onCheckLevel3Answer(CheckLevel3Answer event, Emitter<Level3FindObjectState> emit) {
+  void _onCheckAnswer(CheckAnswer event, Emitter<FindObjectState> emit) {
     final currentState = state;
-    if (currentState is Level3GameLoaded) {
+    if (currentState is GameLoaded) {
       final isCorrect = event.selectedMateri.id == currentState.currentQuestion!.materi.id;
       
       if (isCorrect) {
@@ -115,7 +115,7 @@ class Level3FindObjectBloc extends Bloc<Level3FindObjectEvent, Level3FindObjectS
         emit(currentState.copyWith(
           answeredQuestions: updatedAnsweredQuestions,
           score: currentState.score + 1,
-          lastAnswer: Level3Answer(
+          lastAnswer: LevelAnswer(
             isCorrect: true,
             selectedMateri: event.selectedMateri,
             correctMateri: currentState.currentQuestion!.materi,
@@ -124,7 +124,7 @@ class Level3FindObjectBloc extends Bloc<Level3FindObjectEvent, Level3FindObjectS
         
         // Start next round after a short delay
         Future.delayed(const Duration(milliseconds: 1500), () {
-          add(StartLevel3NewRound());
+          add(StartNewRound());
         });
       } else {
         // Reduce life when answer is wrong
@@ -135,14 +135,14 @@ class Level3FindObjectBloc extends Bloc<Level3FindObjectEvent, Level3FindObjectS
           // Update game score before emitting game over state
           _updateGameScore(currentState.score, currentState.level);
           
-          emit(Level3GameOver(
+          emit(GameOver(
             score: currentState.score,
             totalQuestions: currentState.totalQuestions,
           ));
         } else {
           emit(currentState.copyWith(
             lives: newLives,
-            lastAnswer: Level3Answer(
+            lastAnswer: LevelAnswer(
               isCorrect: false,
               selectedMateri: event.selectedMateri,
               correctMateri: currentState.currentQuestion!.materi,
@@ -165,8 +165,8 @@ class Level3FindObjectBloc extends Bloc<Level3FindObjectEvent, Level3FindObjectS
     }
   }
 
-  List<Level3GameObject> _generateWellDistributedPositions(List<Materi> materiList) {
-    final gameObjects = <Level3GameObject>[];
+  List<GameObject> _generateWellDistributedPositions(List<Materi> materiList) {
+    final gameObjects = <GameObject>[];
     
     // Define game area dimensions (adjust based on your UI)
     const double gameAreaWidth = 300.0;
@@ -207,7 +207,7 @@ class Level3FindObjectBloc extends Bloc<Level3FindObjectEvent, Level3FindObjectS
       // If we still have overlapping after max attempts, just place it anyway
       // This allows for some natural clustering while preventing complete overlap
       
-      gameObjects.add(Level3GameObject(
+      gameObjects.add(GameObject(
         materi: materi,
         position: Offset(x, y),
       ));

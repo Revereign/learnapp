@@ -643,10 +643,10 @@ class _JadikanSempurnaGamePageState extends State<JadikanSempurnaGamePage>
     );
   }
 
-  Widget _buildPlantAnimation(int growthStage) {
+  Widget _buildAnimation(int growthStage) {
     // Ensure growth stage is between 0 and 5
-    final clampedStage = growthStage.clamp(0, 5);
-    final animationValue = clampedStage / 5.0; // Convert to 0.0-1.0 range
+    final rangeStage = growthStage.clamp(0, 5);
+    final animationValue = rangeStage / 5.0; // Convert to 0.0-1.0 range
     
     return Container(
       height: 200,
@@ -1331,7 +1331,7 @@ class _JadikanSempurnaGamePageState extends State<JadikanSempurnaGamePage>
           child: Stack(
             children: [
               BlocConsumer<JadikanSempurnaBloc, JadikanSempurnaState>(
-                                                   listener: (context, state) {
+              listener: (context, state) {
                 if (state is JadikanSempurnaLoaded) {
                   // Reset state when question changes (but not on initial load)
                   if (_lastQuestionIndex != null && _lastQuestionIndex != state.currentQuestionIndex) {
@@ -1472,7 +1472,7 @@ class _JadikanSempurnaGamePageState extends State<JadikanSempurnaGamePage>
                         const SizedBox(height: 30),
                         
                         // Plant animation
-                        _buildPlantAnimation(state.plantGrowthStage),
+                        _buildAnimation(state.plantGrowthStage),
                         
                         const SizedBox(height: 30),
                         

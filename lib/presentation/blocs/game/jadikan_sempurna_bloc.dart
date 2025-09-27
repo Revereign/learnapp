@@ -103,7 +103,7 @@ class JadikanSempurnaLoaded extends JadikanSempurnaState {
     int? currentQuestionIndex,
     int? score,
     int? totalQuestions,
-    int? plantGrowthStage,
+    int? GrowthStage,
     bool? isGameCompleted,
     bool? isGameOver,
     JadikanSempurnaQuestion? currentQuestion,
@@ -116,7 +116,7 @@ class JadikanSempurnaLoaded extends JadikanSempurnaState {
       currentQuestionIndex: currentQuestionIndex ?? this.currentQuestionIndex,
       score: score ?? this.score,
       totalQuestions: totalQuestions ?? this.totalQuestions,
-      plantGrowthStage: plantGrowthStage ?? this.plantGrowthStage,
+      plantGrowthStage: GrowthStage ?? this.plantGrowthStage,
       isGameCompleted: isGameCompleted ?? this.isGameCompleted,
       isGameOver: isGameOver ?? this.isGameOver,
       currentQuestion: currentQuestion ?? this.currentQuestion,
@@ -282,15 +282,15 @@ class JadikanSempurnaBloc extends Bloc<JadikanSempurnaEvent, JadikanSempurnaStat
       if (isCorrect) {
         // Correct answer
         final newScore = currentState.score + 1;
-        final newPlantStage = newScore; // Direct: 1 correct = stage 1, 2 correct = stage 2, etc.
+        final newStage = newScore; // Direct: 1 correct = stage 1, 2 correct = stage 2, etc.
 
         emit(currentState.copyWith(
           score: newScore,
-          plantGrowthStage: newPlantStage,
+          GrowthStage: newStage,
           readingAttempts: 0,
         ));
 
-        // Plant stage 5 = sempurna, tapi game lanjut sampai semua soal selesai
+        // Stage 5 = sempurna, tapi game lanjut sampai semua soal selesai
         // Move to next question regardless of plant stage
         add(StartNewQuestion());
       } else {
@@ -326,7 +326,7 @@ class JadikanSempurnaBloc extends Bloc<JadikanSempurnaEvent, JadikanSempurnaStat
 
         emit(currentState.copyWith(
           score: newScore,
-          plantGrowthStage: newPlantStage,
+          GrowthStage: newPlantStage,
           strokeOrderAttempts: 0,
         ));
 
